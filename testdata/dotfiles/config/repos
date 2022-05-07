@@ -1,0 +1,6 @@
+# example
+# [my_git_repo]
+# url = git@mygitserver.com/my_git_repo
+
+[zsh]
+url = repos/zsh_config/

@@ -1,0 +1,130 @@
+"""
+Module for creating a mutant project directory.
+"""
+import subprocess
+import configparser
+from mutant.exceptions import ConfigFileError
+
+def create_mutant_dir(path):
+	"""
+	Creates a mutant directory in the given path.
+
+	A mutant directory is the main directory managed by mutant.
+	It contains all your git repos.
+
+	Arguments:
+		path: a pathlib.Path object
+	"""
+	path.mkdir()
+	mkdir = lambda p: p.mkdir()
+
+	tasks = (
+		( 'config'           , mkdir                ),
+		( 'config/repos'     , _make_config_repos   ),
+		( 'config/options.m4', _make_config_options ),
+		( 'config'           , _to_repo             ),
+		( 'repos'            , mkdir                ),
+		( 'stow'             , mkdir                ),
+		( 'build'            , mkdir                ),
+	)
+
+	for filename, func in tasks:
+		func(path.joinpath(filename))
+
+def _to_repo(repo_path, *, remote=''):
+	create_commands = (
+		( 'git', 'init' ),
+		( 'git', 'add', '-A' ),
+		( 'git', 'commit', '-m', 'First commit' ),
+	)
+	for command in create_commands:
+		subprocess.run(command, cwd=repo_path)
+
+	if remote:
+		subprocess.run(
+			( 'git', 'remote', 'add', 'origin', remote ),
+			cwd=repo_path,
+		)
+
+def _make_config_repos(path):
+	with path.open('w') as file:
+		data = """
+			# example
+			# [my_git_repo]
+			# url = git@mygitserver.com/my_git_repo
+		"""
+		data = map(lambda s: s.strip(), data.split('\n'))
+		next(data)
+		file.write('\n'.join(data))
+
+def _make_config_options(path):
+	with path.open('w') as file:
+		data = """
+			# Each option name is on a newline.
+			# Whitespace act as delimiters.
+			# This file will be run through m4.
+			# One use of m4 is to get generate options
+			# based on installed packages.
+			# Ex. (for gentoo)
+			#     syscmd(`qlist -I')
+			# I perfer to prefix generated options.
+			# Ex.
+			#     syscmd(`qlist -I | sed "s/^/pack:/"')
+		"""
+		data = map(lambda s: s.strip(), data.split('\n'))
+		next(data)
+		file.write('\n'.join(data))
+
+def clone_repos(mutant_dir):
+	"""
+	Reads config/repos and clones all the repos that are not
+	present in repos/.
+	This function is expected to be used in a directory created
+	by create().
+
+	Arguments:
+		mutant_dir: a pathlib.Path object
+	"""
+	repos = mutant_dir.joinpath('repos')
+	repos_config = mutant_dir.joinpath('config/repos')
+	config = configparser.ConfigParser()
+	config.read(repos_config)
+
+	for repo in map(lambda s: (s,config[s]), config.sections()):
+		name, values = repo
+		dest = repos.joinpath(name)
+		if dest.exists():
+			continue #pragma: nocover
+		try:
+			url = values['url']
+		except KeyError: #pragma: nocover
+			message = f'Url missing in repo config for repo: {name}'
+			raise ConfigFileError(message)
+		command = ('git', 'clone', '--', url, str(dest))
+		subprocess.run(command)
+
+def create_mutation_dir(path, *, remote=''):
+	"""
+	Creates a mutation directory in the given path.
+
+	A program configuration aka "dotfile" repo managed by mutant is
+	called a mutation.
+
+	Arguments:
+		path: a pathlib.Path object
+		remote: upstream url for git repo
+	"""
+	path.mkdir()
+	mkdir = lambda x: x.mkdir()
+	touch = lambda x: x.open('a').close()
+	to_repo = lambda x: _to_repo(x, remote=remote)
+
+	tasks = (
+		( 'genes.conf', touch   ),
+		( 'src'       , mkdir   ),
+		( 'resources' , mkdir   ),
+		( '.'         , to_repo ),
+	)
+
+	for filename, func in tasks:
+		func(path.joinpath(filename))
