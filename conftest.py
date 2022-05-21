@@ -53,7 +53,3 @@ def create_testdir(tmp_path, monkeypatch):
 		monkeypatch.chdir(tmp_path)
 		return tmp_path
 	return create_dir_func
-
-@pytest.fixture()
-def repo_names():
-	return ( 'zsh', )

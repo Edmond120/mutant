@@ -20,12 +20,15 @@ class TestCreator:
 		for path, test in files:
 			assert test(mutant_dir.joinpath(path))
 
-	def test_clone_repos(self, create_testdir, repo_names):
+	def test_clone_repos(self, create_testdir):
 		testdir = create_testdir('clone')
 		dotfiles = testdir.joinpath('dotfiles')
 		repos = dotfiles.joinpath('repos')
 		creator.clone_repos(dotfiles)
 		cloned_repos = set(dotfiles.joinpath('repos').iterdir())
+		repo_names = (
+			'zsh',
+		)
 		for name in repo_names:
 			repo = repos.joinpath(name)
 			assert repo in cloned_repos
