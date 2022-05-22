@@ -37,3 +37,8 @@ class TestM4core:
 			'three four',
 			'five six',
 		))
+
+	def test_M4_include_path(self):
+		m4 = m4core.M4()
+		input_str = "include(`test.m4')`'TEST"
+		assert m4.pipe(input_str) == 'true'

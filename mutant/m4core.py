@@ -3,10 +3,12 @@ Module for interacting with m4
 """
 
 import subprocess
+import mutant.paths
 
 class M4:
 	default_flags = (
 		'--nesting-limit=1024',
+		f'--include={mutant.paths.data_dir}',
 	)
 
 	def __init__(self, flags=default_flags):
