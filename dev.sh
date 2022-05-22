@@ -17,8 +17,8 @@ die() {
 }
 
 clean() {
-	[ -f .coverage ] && rm .coverage
-	[ -d .pytest_temp ] && rm -rf .pytest_temp
+	[ -f .coverage ] && { echo 'Removing: ./.coverage'; rm .coverage; }
+	[ -d .pytest_temp ] && { echo 'Removing: ./.pytest_temp'; rm -rf .pytest_temp; }
 	find . -path ./virtualenv -prune \
 		-o -type d -name __pycache__ -print \
 		-o -type d -name .pytest_cache -print \
@@ -65,6 +65,6 @@ case "$subcommand" in
 		;;
 	coverage )
 		[ -d virtualenv ] || die 'no virtualenv'
-		coverage report -m --omit 'tests/*' --omit 'conftest.py'
+		coverage report
 		;;
 esac
