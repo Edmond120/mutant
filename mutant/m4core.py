@@ -5,11 +5,26 @@ Module for interacting with m4
 import subprocess
 
 class M4:
+	default_flags = (
+		'--nesting-limit=1024',
+	)
+
+	def __init__(self, flags=default_flags):
+		self.flags = list(flags)
+
+	def append_flag(self, flag):
+		self.flags.append(flag)
+
+	def extend_flags(self, flags):
+		for flag in flags:
+			self.append_flag(flag)
+
 	def pipe(self, string):
 		"""
 		Pipes a string through m4 and returns the output.
 		"""
-		args = ('m4',)
+		args = ['m4']
+		args.extend(self.flags)
 		return subprocess.run(
 			args,
 			input=string,

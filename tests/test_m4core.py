@@ -26,3 +26,14 @@ class TestM4core:
 		m4 = m4core.M4()
 		output_str = m4.pipe_file(test_file)
 		assert output_str == self.sample_correct_output
+
+	def test_M4_extend_flags(self):
+		m4 = m4core.M4()
+		flags = [ '--define=one=1', '--define=two=2' ]
+		m4.extend_flags(flags)
+		assert m4.flags == list(m4core.M4.default_flags) + flags
+		assert m4.pipe(self.sample_input) == '\n'.join((
+			'1 2',
+			'three four',
+			'five six',
+		))
