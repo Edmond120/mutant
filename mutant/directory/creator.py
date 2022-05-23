@@ -2,8 +2,7 @@
 Module for creating a mutant project directory.
 """
 import subprocess
-import configparser
-from mutant.exceptions import ConfigFileError
+from mutant.directory import parser
 
 def create_mutant_dir(path):
 	"""
@@ -86,20 +85,15 @@ def clone_repos(mutant_dir):
 		mutant_dir: a pathlib.Path object
 	"""
 	repos = mutant_dir.joinpath('repos')
-	repos_config = mutant_dir.joinpath('config/repos')
-	config = configparser.ConfigParser()
-	config.read(repos_config)
+	repos_config_file = mutant_dir.joinpath('config/repos')
+	repos_config = parser.read_repos(repos_config_file)
 
-	for repo in map(lambda s: (s,config[s]), config.sections()):
-		name, values = repo
+	for config in repos_config:
+		name = config['name']
+		url = config['url']
 		dest = repos.joinpath(name)
 		if dest.exists():
 			continue #pragma: nocover
-		try:
-			url = values['url']
-		except KeyError: #pragma: nocover
-			message = f'Url missing in repo config for repo: {name}'
-			raise ConfigFileError(message)
 		command = ('git', 'clone', '--', url, str(dest))
 		subprocess.run(command)
 
