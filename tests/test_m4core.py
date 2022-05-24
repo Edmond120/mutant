@@ -30,7 +30,7 @@ class TestM4core:
 	def test_M4_extend_flags(self):
 		m4 = m4core.M4()
 		flags = [ '--define=one=1', '--define=two=2' ]
-		m4.extend_flags(flags)
+		m4.flags.extend(flags)
 		assert m4.flags == list(m4core.M4.default_flags) + flags
 		assert m4.pipe(self.sample_input) == '\n'.join((
 			'1 2',

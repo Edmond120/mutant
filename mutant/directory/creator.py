@@ -46,7 +46,7 @@ def _to_repo(repo_path, *, remote=''):
 		)
 
 def _make_config_repos(path):
-	with path.open('w') as file:
+	with path.open('x') as file:
 		data = """
 			# example
 			# [my_git_repo]
@@ -57,7 +57,7 @@ def _make_config_repos(path):
 		file.write('\n'.join(data))
 
 def _make_config_options(path):
-	with path.open('w') as file:
+	with path.open('x') as file:
 		data = """
 			# Each option name is on a newline.
 			# Whitespace act as delimiters.
@@ -110,7 +110,7 @@ def create_mutation_dir(path, *, remote=''):
 	"""
 	path.mkdir()
 	mkdir = lambda x: x.mkdir()
-	touch = lambda x: x.open('a').close()
+	touch = lambda x: x.open('x').close()
 	to_repo = lambda x: _to_repo(x, remote=remote)
 
 	tasks = (

@@ -1,4 +1,3 @@
-import pytest
 from pathlib import Path
 from mutant.directory import parser
 from mutant.exceptions import ConfigFileError

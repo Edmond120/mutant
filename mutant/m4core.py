@@ -6,20 +6,25 @@ import subprocess
 import mutant.paths
 
 class M4:
+	"""
+	Wrapper class for running m4.
+
+	The instance variables listed below are just lists and are
+	safe to modify using functions that are not part of this class.
+
+	Instance variables:
+		flags:
+			List of strings that will be passed as arguments to m4.
+	"""
+
 	default_flags = (
 		'--nesting-limit=1024',
 		f'--include={mutant.paths.data_dir}',
 	)
 
-	def __init__(self, flags=default_flags):
+	def __init__(self, *, flags=default_flags):
 		self.flags = list(flags)
 
-	def append_flag(self, flag):
-		self.flags.append(flag)
-
-	def extend_flags(self, flags):
-		for flag in flags:
-			self.append_flag(flag)
 
 	def pipe(self, string):
 		"""
