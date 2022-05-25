@@ -1,4 +1,6 @@
+import resource
 from mutant import m4core
+from mutant.exceptions import M4Error
 
 class TestM4core:
 	sample_input = '\n'.join((
@@ -42,3 +44,24 @@ class TestM4core:
 		m4 = m4core.M4()
 		input_str = "include(`test.m4')`'TEST"
 		assert m4.pipe(input_str) == 'true'
+
+	def test_M4_rlimits(self):
+		rlimits = (
+			(resource.RLIMIT_STACK, 1024 * 8),
+		)
+		m4 = m4core.M4(rlimits=rlimits)
+		input_str = 'hello world'
+		try:
+			m4.pipe(input_str)
+			assert False
+		except BrokenPipeError:
+			pass
+
+	def test_M4_fatal_warnings(self):
+		m4 = m4core.M4()
+		input_str = "include(`file_that_does_not_exist.txt')"
+		try:
+			m4.pipe(input_str)
+			assert False
+		except M4Error:
+			pass

@@ -3,7 +3,17 @@ Module for interacting with m4
 """
 
 import subprocess
+import resource
+import shutil
 import mutant.paths
+from mutant.utils.process import LimitedProcess
+from mutant.exceptions import M4Error
+
+def _megabytes(n):
+	return int(n * 1024 ** 2)
+
+def _kilobytes(n):
+	return int(n * 1024)
 
 class M4:
 	"""
@@ -15,29 +25,47 @@ class M4:
 	Instance variables:
 		flags:
 			List of strings that will be passed as arguments to m4.
+		rlimits:
+			List of tuples that are in the form of (RLIMIT, VALUE).
+			RLIMIT is a resource type from the "resource" module
+			of the standard python library.
+			VALUE represents the soft limit that will be set for
+			m4.
 	"""
 
 	default_flags = (
 		'--nesting-limit=1024',
 		f'--include={mutant.paths.data_dir}',
+		'--fatal-warnings', # two fatal warnings means to stop execution
+		'--fatal-warnings', # at the first error
 	)
 
-	def __init__(self, *, flags=default_flags):
-		self.flags = list(flags)
+	default_rlimits = (
+		(resource.RLIMIT_DATA,  _megabytes(512)),
+		(resource.RLIMIT_STACK, _kilobytes(8192)),
+	)
 
+	def __init__(self, *, flags=default_flags, rlimits=default_rlimits, size_limit=(-1, -1)):
+		self.flags = list(flags)
+		self.rlimits = list(rlimits)
+		self.size_limit = size_limit
 
 	def pipe(self, string):
 		"""
 		Pipes a string through m4 and returns the output.
 		"""
-		args = ['m4']
+		args = [ shutil.which('m4') ]
 		args.extend(self.flags)
-		return subprocess.run(
+		process = LimitedProcess(
 			args,
-			input=string,
-			text=True,
-			stdout=subprocess.PIPE,
-		).stdout
+			rlimits = self.rlimits,
+			stdin = string,
+			output_limits = self.size_limit,
+		)
+		process.start()
+		if process.returncode != 0:
+			raise M4Error(f'm4 exited with return code {process.returncode}')
+		return process.stdout
 
 	def pipe_file(self, path):
 		"""
