@@ -35,7 +35,7 @@ class M4:
 
 	default_flags = (
 		'--nesting-limit=1024',
-		f'--include={mutant.paths.data_dir}',
+		f'--include={mutant.paths.data_dir.joinpath("m4")}',
 		'--fatal-warnings', # two fatal warnings means to stop execution
 		'--fatal-warnings', # at the first error
 	)

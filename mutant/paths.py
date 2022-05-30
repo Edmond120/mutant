@@ -22,4 +22,4 @@ is_installed = any(map(
 if is_installed: #pragma: nocover
 	data_dir = pathlib.Path(sys.prefix).joinpath('share/mutant').resolve(strict=True)
 else:
-	data_dir = module_dir.parent.joinpath('data/m4').resolve(strict=True)
+	data_dir = module_dir.parent.joinpath('data').resolve(strict=True)

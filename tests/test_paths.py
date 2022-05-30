@@ -25,6 +25,6 @@ class TestPaths:
 	def test_data_dir(self):
 		assert mutant.paths.module_dir.is_absolute()
 		assert self.is_paths_equal(
-			pathlib.Path('data/m4'),
+			pathlib.Path('data'),
 			mutant.paths.data_dir
 		)
