@@ -42,8 +42,8 @@ class TestM4core:
 
 	def test_M4_include_path(self):
 		m4 = m4core.M4()
-		input_str = "include(`test.m4')`'TEST"
-		assert m4.pipe(input_str) == 'true'
+		input_str = "include(`mutant_core.m4')"
+		assert m4.pipe(input_str) == ''
 
 	def test_M4_rlimits(self):
 		rlimits = (
