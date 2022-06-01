@@ -64,7 +64,10 @@ class M4:
 		)
 		process.start()
 		if process.returncode != 0:
-			raise M4Error(f'm4 exited with return code {process.returncode}')
+			raise M4Error('\n'.join((
+				f'm4 returncode: {process.returncode}',
+				f'm4 stderr: {process.stderr}',
+			)))
 		return process.stdout
 
 	def pipe_file(self, path):
