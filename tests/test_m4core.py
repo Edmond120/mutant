@@ -65,3 +65,9 @@ class TestM4core:
 			assert False
 		except M4Error:
 			pass
+
+	def test_M4_pipe_get_stderr(self):
+		m4 = m4core.M4()
+		input_str = "syscmd(`echo this is stderr >&2')"
+		stderr = m4.pipe(input_str, stdout_only=False)[1]
+		assert stderr == 'this is stderr\n'

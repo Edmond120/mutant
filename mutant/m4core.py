@@ -50,7 +50,7 @@ class M4:
 		self.rlimits = list(rlimits)
 		self.size_limit = size_limit
 
-	def pipe(self, string):
+	def __pipe(self, string):
 		"""
 		Pipes a string through m4 and returns the output.
 		"""
@@ -68,7 +68,13 @@ class M4:
 				f'm4 returncode: {process.returncode}',
 				f'm4 stderr: {process.stderr}',
 			)))
-		return process.stdout
+		return (process.stdout, process.stderr)
+
+	def pipe(self, string, *, stdout_only=True):
+		if stdout_only:
+			return self.__pipe(string)[0]
+		else:
+			return self.__pipe(string)
 
 	def pipe_file(self, path):
 		"""
