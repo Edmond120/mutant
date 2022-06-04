@@ -11,6 +11,10 @@ divert(`-1')
 #   methods to be optimized by tail-recursion, since adding a
 #   restorequote at the end of a macro ruins it.
 
+# Notes:
+#   cleanup all temporary macros before the expansions of macros
+#   that deal with namespaces.
+
 # If @thisnamespace is an empty string then the current namespace is
 # the global namespace. All methods defined here are "public".
 define(`@thisnamespace')
@@ -92,32 +96,60 @@ ifelse(`$#', `0', ``enternamespace'',
        eval(`$# > 1'), `1', `errprint(`too many arguments for enternamespace')m4exit(1)',
 `dnl
 dnl
+pushdef(`pushdef_leavenamespace', defn(`@pushdef_leavenamespace'))dnl
 ifelse(
 defn(`@thisnamespace'), `$1',
 `dnl # same namespace -> do nothing
+pushdef_leavenamespace(`', `')dnl
 ',
 defn(`@thisnamespace'), `',
 `dnl # coming from global namespace -> push new namespace macros
 pushdef(`applynamespace', defn(`@applynamespace'))dnl
 applynamespace(popdef(`applynamespace')`$1')dnl
+pushdef_leavenamespace(`$1', `')dnl
 ',
 `$1', `',
 `dnl # going to global namespace -> pop old namespace macros
 pushdef(`removenamespace', defn(`@removenamespace'))dnl
 removenamespace(popdef(`removenamespace')defn(`@thisnamespace'))dnl
+pushdef_leavenamespace(`', defn(`@thisnamespace'))dnl
 ',
 `dnl # different namespace -> pop old namespace macros, push new namespace macros
 pushdef(`removenamespace', defn(`@removenamespace'))dnl
 removenamespace(popdef(`removenamespace')defn(`@thisnamespace'))dnl
 pushdef(`applynamespace', defn(`@applynamespace'))dnl
 applynamespace(popdef(`applynamespace')`$1')dnl
+pushdef_leavenamespace(`$1', defn(`@thisnamespace'))dnl
 dnl
 ')dnl
 pushdef(`@thisnamespace', `$1')dnl
 ')dnl
 dnl
+popdef(`pushdef_leavenamespace')dnl
 restorequote()dnl
 ')
+
+define(`@pushdef_leavenamespace', `dnl
+dnl # $1 = namespace to pop, do not pop if empty string
+dnl # $2 = namespace to push, do not push if empty string
+format(`dnl
+pushdef(`leavenamespace', `changequote`'dnl
+popdef(`leavenamespace')dnl
+%s`'dnl
+%s`'dnl
+restorequote()dnl
+')dnl
+',
+ifelse(`$1', `', `',
+``pushdef(`removenamespace', defn(`@removenamespace'))dnl
+removenamespace(popdef(`removenamespace')`$1')dnl
+''),
+ifelse(`$2', `', `',
+``pushdef(`applynamespace', defn(`@applynamespace'))dnl
+applynamespace(popdef(`applynamespace')`$2')dnl
+''))')
+
+define(`leavenamespace')
 
 restoredivert()dnl
 ')dnl
