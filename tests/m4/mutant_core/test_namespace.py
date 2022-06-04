@@ -1,4 +1,5 @@
 from .core_tester import MutantCoreTester
+from mutant.exceptions import M4Error
 
 class TestMutantCoreNamespace(MutantCoreTester):
 	include_file = 'namespace.m4'
@@ -40,5 +41,100 @@ class TestMutantCoreNamespace(MutantCoreTester):
 	def test_namespacemethod_fail_empty_macroname(self):
 		input_str = """
 		namespacemethod(`testspace', `', `hello world')dnl
+		"""
+		assert self.m4_fail(input_str)
+
+	def test_enternamespace(self):
+		input_str = """
+		define(`@namespace[testspace]', `1')dnl
+		define(`@namespace[testspace][1]', `greeting')dnl
+		define(`@namespace[testspace]:greeting', `hello world')dnl
+		enternamespace(`testspace')dnl
+		greeting
+		"""
+		correct_output = """
+		hello world
+		"""
+		assert self.m4_match(input_str, correct_output)
+
+	def test_enternamespace_do_nothing(self):
+		input_str = "enternamespace(`')"
+		correct_output = ""
+		assert(self.m4_match(input_str, correct_output))
+
+	def test_enternamespace_do_not_enter_twice(self):
+		input_str = """
+		define(`@namespace[testspace]', `1')dnl
+		define(`@namespace[testspace][1]', `greeting')dnl
+		define(`@namespace[testspace]:greeting', `hello world')dnl
+		enternamespace(`testspace')dnl
+		enternamespace(`testspace')dnl
+		popdef(`greeting')dnl
+		greeting
+		"""
+		correct_output = """
+		greeting
+		"""
+		assert self.m4_match(input_str, correct_output)
+
+	def test_enternamespace_switch_namespaces(self):
+		input_str = """
+		define(`@namespace[A]', `2')dnl
+		define(`@namespace[A][1]', `word')dnl
+		define(`@namespace[A][2]', `A_ONLY')dnl
+		define(`@namespace[A]:word', `tree')dnl
+		define(`@namespace[A]:A_ONLY', `EXPANDED')dnl
+		dnl
+		define(`@namespace[B]', `1')dnl
+		define(`@namespace[B][1]', `word')dnl
+		define(`@namespace[B]:word', `grass')dnl
+		dnl
+		word
+		enternamespace(`A')dnl
+		word
+		A_ONLY
+		enternamespace(`B')dnl
+		word
+		A_ONLY
+		"""
+		correct_output = """
+		word
+		tree
+		EXPANDED
+		grass
+		A_ONLY
+		"""
+		assert self.m4_match(input_str, correct_output)
+
+	def test_enternamespace_return_to_global(self):
+		input_str = """
+		define(`@namespace[testspace]', `1')dnl
+		define(`@namespace[testspace][1]', `greeting')dnl
+		define(`@namespace[testspace]:greeting', `hello world')dnl
+		greeting
+		enternamespace(`testspace')dnl
+		greeting
+		enternamespace(`')dnl
+		greeting
+		"""
+		correct_output = """
+		greeting
+		hello world
+		greeting
+		"""
+		assert self.m4_match(input_str, correct_output)
+
+	def test_enternamespace_fail_unknown_namespace(self):
+		input_str = """
+		enternamespace(`not_created')dnl
+		"""
+		assert self.m4_fail(input_str)
+
+	def test_enternamespace_fail_too_many_args(self):
+		input_str = """
+		define(`@namespace[testspace]', `1')dnl
+		define(`@namespace[testspace][1]', `greeting')dnl
+		define(`@namespace[testspace]:greeting', `hello world')dnl
+		enternamespace(`testspace', 0)dnl
 		"""
 		assert self.m4_fail(input_str)

@@ -56,5 +56,68 @@ popdef(`namespacemacro')dnl
 restorequote()dnl
 ')
 
+define(`@namespace_loop', `dnl
+dnl # $1 = namespace
+dnl # $2 = index
+dnl # $3 = operation
+ifelse(eval(`$2 > 0'), `1', `dnl
+pushdef(`macroname',
+    defn(format(``@namespace[%s][%d]'', `$1', `$2')))dnl
+pushdef(`macrodefinition',
+	defn(format(``@namespace[%s]:%s'', `$1', defn(`macroname'))))dnl
+$3(defn(`macroname'), defn(`macrodefinition'))dnl
+popdef(`macrodefinition')dnl
+popdef(`macroname')dnl
+pushdef(`loop', defn(`@namespace_loop'))dnl
+loop(popdef(`loop')`$1', decr(`$2'), `$3')')')
+
+define(`@applynamespace', `dnl
+pushdef(`loop', defn(`@namespace_loop'))dnl
+loop(
+    popdef(`loop')`$1',
+    defn(format(``@namespace[%s]'', `$1')),
+    `pushdef')`'dnl
+')
+
+define(`@removenamespace', `dnl
+pushdef(`loop', defn(`@namespace_loop'))dnl
+loop(
+    popdef(`loop')`$1',
+    defn(format(``@namespace[%s]'', `$1')),
+    `popdef')`'dnl
+')
+
+define(`enternamespace', `changequote`'dnl
+ifelse(`$#', `0', ``enternamespace'',
+       eval(`$# > 1'), `1', `errprint(`too many arguments for enternamespace')m4exit(1)',
+`dnl
+dnl
+ifelse(
+defn(`@thisnamespace'), `$1',
+`dnl # same namespace -> do nothing
+',
+defn(`@thisnamespace'), `',
+`dnl # coming from global namespace -> push new namespace macros
+pushdef(`applynamespace', defn(`@applynamespace'))dnl
+applynamespace(popdef(`applynamespace')`$1')dnl
+',
+`$1', `',
+`dnl # going to global namespace -> pop old namespace macros
+pushdef(`removenamespace', defn(`@removenamespace'))dnl
+removenamespace(popdef(`removenamespace')defn(`@thisnamespace'))dnl
+',
+`dnl # different namespace -> pop old namespace macros, push new namespace macros
+pushdef(`removenamespace', defn(`@removenamespace'))dnl
+removenamespace(popdef(`removenamespace')defn(`@thisnamespace'))dnl
+pushdef(`applynamespace', defn(`@applynamespace'))dnl
+applynamespace(popdef(`applynamespace')`$1')dnl
+dnl
+')dnl
+pushdef(`@thisnamespace', `$1')dnl
+')dnl
+dnl
+restorequote()dnl
+')
+
 restoredivert()dnl
 ')dnl
