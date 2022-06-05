@@ -1,4 +1,5 @@
 from mutant.m4core import M4
+from mutant.exceptions import M4Error
 
 class MutantCoreTester:
 	"""
@@ -73,3 +74,16 @@ class MutantCoreTester:
 		print(f'output: {output}')
 		print(f'stderr: {stderr}')
 		return output == correct_output
+
+	@classmethod
+	def m4_fail(cls, input_str):
+		assert len(cls.include_file)
+		input_str = cls.format_str(input_str)
+		include_str = cls.__get_include_str()
+		input_str = include_str + input_str
+		m4 = M4()
+		try:
+			m4.pipe(input_str, stdout_only=False)
+			return False
+		except M4Error:
+			return True
