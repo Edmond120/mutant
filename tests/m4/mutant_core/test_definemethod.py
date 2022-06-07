@@ -1,4 +1,4 @@
-from .core_tester import MutantCoreTester
+from testlib import MutantCoreTester
 
 class TestMutantCoreDefinemethod(MutantCoreTester):
 	include_file = 'definemethod.m4'

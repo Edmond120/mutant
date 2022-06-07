@@ -1,7 +1,7 @@
 from mutant.m4core import M4
 from mutant.exceptions import M4Error
 
-class MutantCoreTester:
+class M4Tester:
 	"""
 	Class for testing m4 files.
 	M4 input and correct output  are formatted in a particular way
@@ -12,6 +12,7 @@ class MutantCoreTester:
 	removed.
 	"""
 	include_file = ''
+	include_prefix = ''
 
 	@staticmethod
 	def __uniform_list(lst):
@@ -26,10 +27,10 @@ class MutantCoreTester:
 	@classmethod
 	def __get_include_str(cls):
 		if isinstance(cls.include_file, str):
-			return f"include(`mutant_core/{cls.include_file}')dnl\n"
+			return f"include(`{cls.include_prefix}{cls.include_file}')dnl\n"
 		include_str = ''
 		for file in cls.include_file:
-			include_str += f"include(`mutant_core/{file}')dnl\n"
+			include_str += f"include(`{cls.include_prefix}{file}')dnl\n"
 		return include_str
 
 	@classmethod

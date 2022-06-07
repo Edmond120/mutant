@@ -1,4 +1,4 @@
-from .core_tester import MutantCoreTester
+from testlib import MutantCoreTester
 from mutant.exceptions import M4Error
 
 class TestMutantCoreNamespace(MutantCoreTester):

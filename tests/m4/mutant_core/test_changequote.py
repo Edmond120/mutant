@@ -1,4 +1,4 @@
-from .core_tester import MutantCoreTester
+from testlib import MutantCoreTester
 
 class TestMutantCoreChangequote(MutantCoreTester):
 	include_file = 'changequote.m4'

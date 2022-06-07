@@ -1,4 +1,4 @@
-from .core_tester import MutantCoreTester
+from testlib import MutantCoreTester
 
 class TestMutantCoreDivert(MutantCoreTester):
 	include_file = 'divert.m4'
