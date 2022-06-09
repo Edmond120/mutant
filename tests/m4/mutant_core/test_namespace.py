@@ -4,9 +4,9 @@ from mutant.exceptions import M4Error
 class TestMutantCoreNamespace(MutantCoreTester):
 	include_file = 'namespace.m4'
 
-	def test_namespacemethod(self):
+	def test_namespacedef(self):
 		input_str = """
-		namespacemethod(`testspace', `greeting', `hello world')dnl
+		namespacedef(`testspace', `greeting', `hello world')dnl
 		defn(`@namespace[testspace]')
 		defn(`@namespace[testspace][1]')
 		defn(`@namespace[testspace]:greeting')
@@ -18,12 +18,12 @@ class TestMutantCoreNamespace(MutantCoreTester):
 		"""
 		assert self.m4_match(input_str, correct_output)
 
-	def test_namespacemethod_when_in_namespace(self):
+	def test_namespacedef_when_in_namespace(self):
 		input_str = """
-		namespacemethod(`testspace', `greeting', `hello world')dnl
+		namespacedef(`testspace', `greeting', `hello world')dnl
 		greeting
 		pushdef(`@thisnamespace', `arcade')dnl
-		namespacemethod(`arcade', `ping', `pong')dnl
+		namespacedef(`arcade', `ping', `pong')dnl
 		ping
 		"""
 		correct_output = """
@@ -32,17 +32,33 @@ class TestMutantCoreNamespace(MutantCoreTester):
 		"""
 		assert self.m4_match(input_str, correct_output)
 
-	def test_namespacemethod_fail_empty_namespace(self):
+	def test_namespacedef_fail_empty_namespace(self):
 		input_str = """
-		namespacemethod(`', `greeting', `hello world')dnl
+		namespacedef(`', `greeting', `hello world')dnl
 		"""
 		assert self.m4_fail(input_str)
 
-	def test_namespacemethod_fail_empty_macroname(self):
+	def test_namespacedef_fail_empty_macroname(self):
 		input_str = """
-		namespacemethod(`testspace', `', `hello world')dnl
+		namespacedef(`testspace', `', `hello world')dnl
 		"""
 		assert self.m4_fail(input_str)
+
+	def test_namespacemethod(self):
+		input_str = """
+		namespacemethod(`testspace', `greeting', `
+		# comments will not show up
+		pushdef(`output', `hello world')
+		print(output)
+		popdef(`output')
+		')dnl
+		define(`greet', defn(`@namespace[testspace]:greeting'))dnl
+		greet
+		"""
+		correct_output = """
+		hello world
+		"""
+		assert self.m4_match(input_str, correct_output)
 
 	def test_enternamespace(self):
 		input_str = """

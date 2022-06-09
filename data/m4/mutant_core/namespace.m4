@@ -2,6 +2,7 @@ ifdef(`@include[mutant_core/namespace.m4]', `', `dnl
 define(`@include[mutant_core/namespace.m4]')dnl
 include(`mutant_core/changequote.m4')dnl
 include(`mutant_core/divert.m4')dnl
+include(`mutant_core/definemethod.m4')dnl
 divert(`-1')
 
 # namespace method specs:
@@ -19,7 +20,7 @@ divert(`-1')
 # the global namespace. All methods defined here are "public".
 define(`@thisnamespace')
 
-define(`namespacemethod', `changequote`'dnl
+define(`namespacedef', `changequote`'dnl
 pushdef(`namespace', `$1')dnl
 pushdef(`macroname', `$2')dnl
 pushdef(`definition', `$3')dnl
@@ -57,6 +58,13 @@ popdef(`namespace')dnl
 popdef(`macroname')dnl
 popdef(`definition')dnl
 popdef(`namespacemacro')dnl
+restorequote()dnl
+')
+
+define(`namespacemethod', `changequote`'dnl
+definemethod(`@namespacemethod_temp', `$3')dnl
+namespacedef(`$1', `$2', defn(`@namespacemethod_temp'))dnl
+undefine(`@namespacemethod_temp')dnl
 restorequote()dnl
 ')
 
