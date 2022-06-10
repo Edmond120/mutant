@@ -7,15 +7,6 @@ divert(`-1')
 # Variable to hold the output of a macro
 define(`@macro_output')
 
-# Discard arguments and output @macro_output instead
-define(`@print_based_output()', `changequote`'dnl
-pushdef(`func', defn(`@macro_output'))dnl
-func`'dnl
-popdef(`func')dnl
-popdef(`@macro_output')dnl
-restorequote()dnl
-')
-
 define(`@print()', `changequote
 	pushdef(`@temp', defn(`@macro_output'))
 	popdef(`@macro_output')
@@ -38,21 +29,28 @@ define(`@printnl()', `changequote
 #   - No unquoted dangling parentheses (due to implementation)
 define(`definemethod', `changequote`'dnl
 define(`$1', `changequote`'dnl
-dnl
 pushdef(`print', defn(`@print()'))dnl
 pushdef(`printnl', defn(`@printnl()'))dnl
-pushdef(`func', defn(`@print_based_output()'))dnl
+pushdef(`func', defn(`@method_return()'))dnl
 pushdef(`@macro_output')dnl
 func(popdef(`func')
 $2
-)dnl
-popdef(`print')dnl
-popdef(`printnl')dnl
-dnl
-restorequote()dnl
-')dnl
+restorequote
+)')dnl
 restorequote()dnl
 ')
+
+# Discard arguments and output @macro_output instead
+define(`@method_return()', `changequote`'dnl
+pushdef(`func', defn(`@macro_output'))dnl
+func(
+popdef(`func')
+popdef(`@macro_output')
+popdef(`print')
+popdef(`printnl')
+restorequote
+)')
+
 
 restoredivert()dnl
 ')dnl
