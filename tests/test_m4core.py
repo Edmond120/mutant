@@ -46,16 +46,14 @@ class TestM4core:
 		assert m4.pipe(input_str) == ''
 
 	def test_M4_rlimits(self):
+		limit = resource.getrlimit(resource.RLIMIT_STACK)
+		softlimit = 1024 * 1024 * 7 if limit[0] == resource.RLIM_INFINITY else limit[0] - 1
 		rlimits = (
-			(resource.RLIMIT_STACK, 1024 * 8),
+			(resource.RLIMIT_STACK, softlimit),
 		)
 		m4 = m4core.M4(rlimits=rlimits)
-		input_str = 'hello world'
-		try:
-			m4.pipe(input_str)
-			assert False
-		except BrokenPipeError:
-			pass
+		input_str = f'syscmd(python -c "import resource; print(resource.getrlimit(\"resource.RLIMIT_STACK\")[0])")'
+		assert m4.pipe(input_str) == f'{softlimit}\n'
 
 	def test_M4_fatal_warnings(self):
 		m4 = m4core.M4()
