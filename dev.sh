@@ -56,11 +56,10 @@ case "$subcommand" in
 		;;
 	test )
 		[ -d virtualenv ] || die 'no virtualenv'
-		[ -d .pytest_temp ] || mkdir .pytest_temp
 		if [ "$CAPTURE" = false ]; then
-			TMPDIR="${PWD}/.pytest_temp" coverage run -m pytest -s tests
+			coverage run -m pytest -s tests
 		else
-			TMPDIR="${PWD}/.pytest_temp" coverage run -m pytest tests
+			coverage run -m pytest tests
 		fi
 		;;
 	coverage )
