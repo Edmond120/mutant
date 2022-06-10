@@ -20,7 +20,8 @@ define(`@printnl()', `changequote
 	popdef(`@macro_output')
 	pushdef(`@macro_output', defn(`@temp')`$1
 ')
-	restorequote
+	popdef(`@temp')
+	restorequote()
 ')
 
 # Method specs
