@@ -42,3 +42,55 @@ class TestMutantCoreDefinemethod(MutantCoreTester):
 			10,9,8,7,6,5,4,3,2,1,
 		"""
 		assert self.m4_match(input_str, output_str)
+
+	def test_definemethod_var_internal(self):
+		input_str = """
+		definemethod(`test', `
+			var(`greeting', `hello world')
+			format(
+				`
+				println(``%s'')
+				println(``%s'')
+				println(``%s'')
+				println(``%s'')
+				println(``%s'')
+				',
+				defn(`greeting'),
+				defn(`@definemethod_layer'),
+				defn(`@definemethod_var[1]'),
+				defn(`@definemethod_var[1][1]'),
+				defn(`@definemethod_var[1]:greeting'))
+		')dnl
+		test`'dnl
+		"""
+		output_str = """
+		hello world
+		1
+		1
+		greeting
+		hello world
+		"""
+		assert self.m4_match(input_str, output_str)
+
+	def test_definemethod_var(self):
+		input_str = """
+		definemethod(`first', `
+			var(`greeting', ``hello world'')
+			println(greeting)
+			print(second)
+			println(greeting)
+		')dnl
+		definemethod(`second', `
+			println([defn(`greeting')]) # greeting should not be defined
+			var(`greeting', ``HELLO WORLD'')
+			println(greeting)
+		')dnl
+		first`'dnl
+		"""
+		output_str = """
+		hello world
+		[]
+		HELLO WORLD
+		hello world
+		"""
+		assert self.m4_match(input_str, output_str)
