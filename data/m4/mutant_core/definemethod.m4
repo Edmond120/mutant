@@ -15,7 +15,7 @@ define(`@print()', `changequote
 	restorequote()
 ')
 
-define(`@printnl()', `changequote
+define(`@println()', `changequote
 	pushdef(`@temp', defn(`@macro_output'))
 	popdef(`@macro_output')
 	pushdef(`@macro_output', defn(`@temp')`$1
@@ -31,7 +31,7 @@ define(`@printnl()', `changequote
 define(`definemethod', `changequote`'dnl
 define(`$1', `changequote`'dnl
 pushdef(`print', defn(`@print()'))dnl
-pushdef(`printnl', defn(`@printnl()'))dnl
+pushdef(`println', defn(`@println()'))dnl
 pushdef(`func', defn(`@method_return()'))dnl
 pushdef(`@macro_output')dnl
 func(popdef(`func')
@@ -48,7 +48,7 @@ func(
 popdef(`func')
 popdef(`@macro_output')
 popdef(`print')
-popdef(`printnl')
+popdef(`println')
 restorequote
 )')
 

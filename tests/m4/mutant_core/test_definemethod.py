@@ -17,10 +17,10 @@ class TestMutantCoreDefinemethod(MutantCoreTester):
 		"""
 		assert self.m4_match(input_str, output_str)
 
-	def test_definemethod_printnl(self):
+	def test_definemethod_println(self):
 		input_str = """
 			definemethod(`mymethod', `
-				printnl(`hello world')
+				println(`hello world')
 			')dnl
 			mymethod()dnl
 		"""
