@@ -105,8 +105,12 @@ loop(
 
 define(`enternamespace', `changequote`'dnl
 ifelse(`$#', `0', ``enternamespace'',
-       eval(`$# > 1'), `1', `errprint(`too many arguments for enternamespace')m4exit(1)',
-`dnl
+       eval(`$# > 1'), `1', `errprint(`too many arguments for enternamespace')m4exit(1)')dnl
+ifelse(`$1', `', `',
+    `ifdef(format(``@namespace[%s]'', `$1'),
+         `',
+        `dnl # create namespace if it does not exist
+define(format(``@namespace[%s]'', `$1'), `0')')')dnl
 dnl
 pushdef(`pushdef_leavenamespace', defn(`@pushdef_leavenamespace'))dnl
 ifelse(
@@ -135,7 +139,6 @@ pushdef_leavenamespace(`$1', defn(`@thisnamespace'))dnl
 dnl
 ')dnl
 pushdef(`@thisnamespace', `$1')dnl
-')dnl
 dnl
 popdef(`pushdef_leavenamespace')dnl
 restorequote()dnl

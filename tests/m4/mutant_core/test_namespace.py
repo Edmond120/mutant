@@ -153,11 +153,17 @@ class TestMutantCoreNamespace(MutantCoreTester):
 		"""
 		assert self.m4_match(input_str, correct_output)
 
-	def test_enternamespace_fail_unknown_namespace(self):
+	def test_enternamespace_create(self):
 		input_str = """
-		enternamespace(`not_created')dnl
+		enternamespace(`new_namespace')dnl
+		defn(`@thisnamespace')
+		defn(`@namespace[new_namespace]')
 		"""
-		assert self.m4_fail(input_str)
+		correct_output = """
+		new_namespace
+		0
+		"""
+		assert self.m4_match(input_str, correct_output)
 
 	def test_enternamespace_fail_too_many_args(self):
 		input_str = """
