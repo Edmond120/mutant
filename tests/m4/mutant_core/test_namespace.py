@@ -251,3 +251,29 @@ class TestMutantCoreNamespace(MutantCoreTester):
 		hello world
 		"""
 		assert self.m4_match(input_str, correct_output)
+
+	def test_namespace_reentry(self):
+		input_str = """
+		namespacemethod(`testspace', `greeting', `
+			print(`hello world')
+		')dnl
+		greeting
+		fishing
+		enternamespace(`testspace')dnl
+		greeting
+		namespacedef(`testspace', `fishing', `tuna')dnl
+		fishing
+		leavenamespace`'dnl
+		enternamespace(`testspace')dnl
+		greeting
+		fishing
+		"""
+		correct_output = """
+		greeting
+		fishing
+		hello world
+		tuna
+		hello world
+		tuna
+		"""
+		assert self.m4_match(input_str, correct_output)

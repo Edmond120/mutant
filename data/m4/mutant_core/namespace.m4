@@ -145,6 +145,7 @@ pushdef(`leavenamespace', `changequote`'dnl
 popdef(`leavenamespace')dnl
 %s`'dnl
 %s`'dnl
+popdef(`@thisnamespace')dnl
 restorequote()dnl
 ')dnl
 ',
