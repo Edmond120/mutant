@@ -34,6 +34,10 @@ class M4Tester:
 		return include_str
 
 	@classmethod
+	def _get_prepend_str(cls):
+		return cls.__get_include_str()
+
+	@classmethod
 	def format_str(cls, string):
 		lines = string.split('\n')
 		if len(lines) and not len(lines[0].lstrip()):
@@ -67,8 +71,8 @@ class M4Tester:
 		assert len(cls.include_file)
 		input_str = cls.format_str(input_str)
 		correct_output = cls.format_str(correct_output)
-		include_str = cls.__get_include_str()
-		input_str = include_str + input_str
+		prepend_str = cls._get_prepend_str()
+		input_str = prepend_str + input_str
 		m4 = M4()
 		output, stderr = m4.pipe(input_str, stdout_only=False)
 		print(f'correct output: {correct_output}')
