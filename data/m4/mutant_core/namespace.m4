@@ -52,7 +52,11 @@ format(`define(`%s:%s', `%s')',
 	defn(`macroname'),
 	defn(`definition'))dnl
 ifelse(defn(`@thisnamespace'), defn(`namespace'),
-`pushdef(defn(`macroname'), defn(`definition'))')dnl
+`dnl
+ifdef(format(``%s:%s'', defn(`namespacemacro'), defn(`macroname')),
+`popdef(defn(`macroname'))')dnl
+pushdef(defn(`macroname'), defn(`definition'))dnl
+')dnl
 dnl
 popdef(`namespace')dnl
 popdef(`macroname')dnl

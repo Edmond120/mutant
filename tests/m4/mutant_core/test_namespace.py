@@ -18,6 +18,19 @@ class TestMutantCoreNamespace(MutantCoreTester):
 		"""
 		assert self.m4_match(input_str, correct_output)
 
+	def test_namespacedef_overwrite(self):
+		input_str = """
+		define(`@thisnamespace', `testspace')dnl
+		namespacedef(`testspace', `fish', `tuna')dnl
+		namespacedef(`testspace', `fish', `carp')dnl
+		popdef(`fish')dnl
+		fish
+		"""
+		correct_output = """
+		fish
+		"""
+		assert self.m4_match(input_str, correct_output)
+
 	def test_namespacedef_when_in_namespace(self):
 		input_str = """
 		namespacedef(`testspace', `greeting', `hello world')dnl
