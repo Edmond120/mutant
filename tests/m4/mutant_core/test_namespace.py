@@ -57,9 +57,56 @@ class TestMutantCoreNamespace(MutantCoreTester):
 		"""
 		assert self.m4_fail(input_str)
 
+	def test_namespacedef_one_arg(self):
+		input_str = """
+		define(`@thisnamespace', `testspace')dnl
+		namespacedef(`one_arg')dnl
+		defn(`@namespace[testspace]')
+		defn(`@namespace[testspace][1]')
+		[defn(`@namespace[testspace]:one_arg')]
+		"""
+		correct_output = """
+		1
+		one_arg
+		[]
+		"""
+		assert self.m4_match(input_str, correct_output)
+
+	def test_namespacedef_two_args(self):
+		input_str = """
+		define(`@thisnamespace', `testspace')dnl
+		namespacedef(`one_arg', `fish')dnl
+		defn(`@namespace[testspace]')
+		defn(`@namespace[testspace][1]')
+		defn(`@namespace[testspace]:one_arg')
+		"""
+		correct_output = """
+		1
+		one_arg
+		fish
+		"""
+		assert self.m4_match(input_str, correct_output)
+
 	def test_namespacemethod(self):
 		input_str = """
 		namespacemethod(`testspace', `greeting', `
+		# comments will not show up
+		pushdef(`output', `hello world')
+		print(output)
+		popdef(`output')
+		')dnl
+		define(`greet', defn(`@namespace[testspace]:greeting'))dnl
+		greet
+		"""
+		correct_output = """
+		hello world
+		"""
+		assert self.m4_match(input_str, correct_output)
+
+	def test_namespacemethod_two_args(self):
+		input_str = """
+		define(`@thisnamespace', `testspace')dnl
+		namespacemethod(`greeting', `
 		# comments will not show up
 		pushdef(`output', `hello world')
 		print(output)

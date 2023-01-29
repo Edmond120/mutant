@@ -21,7 +21,12 @@ divert(`-1')
 define(`@thisnamespace')
 
 define(`namespacedef', `changequote`'dnl
-pushdef(`namespace', `$1')dnl
+ifelse(eval(`$# == 1'), `1',
+`namespacedef(defn(`@thisnamespace'), `$1', `')',
+eval(`$# == 2'), `1',
+`namespacedef(defn(`@thisnamespace'), `$1', `$2')',
+dnl
+`pushdef(`namespace', `$1')dnl
 pushdef(`macroname', `$2')dnl
 pushdef(`definition', `$3')dnl
 pushdef(`namespacemacro', format(``@namespace[%s]'', defn(`namespace')))dnl
@@ -63,14 +68,16 @@ popdef(`macroname')dnl
 popdef(`definition')dnl
 popdef(`namespacemacro')dnl
 restorequote()dnl
-')
+')')
 
 define(`namespacemethod', `changequote`'dnl
-definemethod(`@namespacemethod_temp', `$3')dnl
+ifelse(eval(`$# == 2'), `1',
+`namespacemethod(defn(`@thisnamespace'), `$1', `$2')',
+`definemethod(`@namespacemethod_temp', `$3')dnl
 namespacedef(`$1', `$2', defn(`@namespacemethod_temp'))dnl
 undefine(`@namespacemethod_temp')dnl
 restorequote()dnl
-')
+')')
 
 define(`@namespace_loop', `dnl
 dnl # $1 = namespace
