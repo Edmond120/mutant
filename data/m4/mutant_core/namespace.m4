@@ -91,21 +91,20 @@ pushdef(`macrodefinition',
 $3(defn(`macroname'), defn(`macrodefinition'))dnl
 popdef(`macrodefinition')dnl
 popdef(`macroname')dnl
-pushdef(`loop', defn(`@namespace_loop'))dnl
-loop(popdef(`loop')`$1', decr(`$2'), `$3')')')
+indir(`@namespace_loop', `$1', decr(`$2'), `$3')')')
 
 define(`@applynamespace', `dnl
-pushdef(`loop', defn(`@namespace_loop'))dnl
-loop(
-    popdef(`loop')`$1',
+indir(
+	`@namespace_loop',
+    `$1',
     defn(format(``@namespace[%s]'', `$1')),
     `pushdef')`'dnl
 ')
 
 define(`@removenamespace', `dnl
-pushdef(`loop', defn(`@namespace_loop'))dnl
-loop(
-    popdef(`loop')`$1',
+indir(
+	`@namespace_loop',
+    `$1',
     defn(format(``@namespace[%s]'', `$1')),
     `popdef')`'dnl
 ')

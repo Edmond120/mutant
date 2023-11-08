@@ -89,13 +89,11 @@ pushdef(`print', defn(`@print()'))dnl
 pushdef(`println', defn(`@println()'))dnl
 pushdef(`var', defn(`@define_var'))dnl
 pushdef(`@macro_output')dnl
-pushdef(`remove', defn(`@remove_method_vars()'))dnl
-remove(popdef(`remove'))dnl
+indir(`@remove_method_vars()')dnl
 define(`@definemethod_layer', incr(defn(`@definemethod_layer')))dnl
 format(`define(`@definemethod_var[%s]', 0)',
 	defn(`@definemethod_layer'))dnl
-pushdef(`func', defn(`@method_return()'))dnl
-func(popdef(`func')
+indir(`@method_return()',
 $2
 restorequote
 )')dnl
@@ -103,15 +101,13 @@ restorequote()dnl
 ')
 
 define(`@apply_method_vars()', `dnl
-pushdef(`func', defn(`@method_vars_loop()'))dnl
-func(popdef(`func')defn(`@definemethod_layer'),
+indir(`@method_vars_loop()', defn(`@definemethod_layer'),
 	format(`defn(`@definemethod_var[%d]')', defn(`@definemethod_layer')),
 	`pushdef')dnl
 ')
 
 define(`@remove_method_vars()', `dnl
-pushdef(`func', defn(`@method_vars_loop()'))dnl
-func(popdef(`func')defn(`@definemethod_layer'),
+indir(`@method_vars_loop()', defn(`@definemethod_layer'),
 	format(`defn(`@definemethod_var[%d]')', defn(`@definemethod_layer')),
 	`popdef')dnl
 ')
@@ -129,21 +125,17 @@ pushdef(
 ', `$3', `popdef', `dnl
 popdef(defn(`@definemethod_var[$1][$2]'))dnl
 ')dnl
-pushdef(`loop', defn(`@method_vars_loop()'))dnl
-loop(popdef(`loop')`$1', decr(`$2'), `$3')')')
+indir(`@method_vars_loop()', `$1', decr(`$2'), `$3')')')
 
 # Discard arguments and output @macro_output instead
 define(`@method_return()', `changequote`'dnl
-pushdef(`remove', defn(`@remove_method_vars()'))dnl
-remove(popdef(`remove'))dnl
+indir(`@remove_method_vars()')dnl
 dnl
-pushdef(`func', defn(`@clean_definemethod_var()'))dnl
-func(popdef(`func')defn(`@definemethod_layer'),
+indir(`@clean_definemethod_var()', defn(`@definemethod_layer'),
 	format(`defn(`@definemethod_var[%d]')',
 		defn(`@definemethod_layer')))dnl
 define(`@definemethod_layer', decr(defn(`@definemethod_layer')))dnl
-pushdef(`apply', defn(`@apply_method_vars()'))dnl
-apply(popdef(`apply'))dnl
+indir(`@apply_method_vars()')dnl
 pushdef(`func', defn(`@macro_output'))dnl
 dnl
 func(
@@ -169,8 +161,7 @@ ifelse(format(`eval(%s == 0)', defn(defn(`macro'))), 1, `dnl
 undefine(defn(`macro'))dnl
 ')dnl
 popdef(`macro')dnl
-pushdef(`func', defn(`@clean_definemethod_var()'))dnl
-func(popdef(`func')`$1', decr(`$2'))')')
+indir(`@clean_definemethod_var()', `$1', decr(`$2'))')')
 
 
 restoredivert()dnl
