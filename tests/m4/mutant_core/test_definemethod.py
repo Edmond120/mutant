@@ -94,3 +94,24 @@ class TestMutantCoreDefinemethod(MutantCoreTester):
 		hello world
 		"""
 		assert self.m4_match(input_str, output_str)
+
+	def test_definemethod_nested_call(self):
+		input_str = """
+		definemethod(`first', `
+			var(`one', `ONE')
+			print(`layer 1')
+		')dnl
+		definemethod(`second', `
+			println(one)
+			var(`two', first)
+			print(two)
+		')dnl
+		first
+		second
+		"""
+		output_str = """
+			layer 1
+			one
+			layer 1
+		"""
+		assert self.m4_match(input_str, output_str)
