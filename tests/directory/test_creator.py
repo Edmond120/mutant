@@ -41,10 +41,10 @@ class TestCreator:
 		is_directory = lambda x: x.is_dir()
 		is_file = lambda x: x.is_file()
 		files = (
-			( '.git'      , is_directory ),
-			( 'src'       , is_directory ),
-			( 'resources' , is_directory ),
-			( 'genes.conf', is_file      ),
+			( '.git'       , is_directory ),
+			( 'src'        , is_directory ),
+			( 'resources'  , is_directory ),
+			( 'provides.m4', is_file      ),
 		)
 
 		for path, test in files:

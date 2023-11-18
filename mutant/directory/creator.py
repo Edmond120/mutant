@@ -114,10 +114,10 @@ def create_mutation_dir(path, *, remote=''):
 	to_repo = lambda x: _to_repo(x, remote=remote)
 
 	tasks = (
-		( 'genes.conf', touch   ),
-		( 'src'       , mkdir   ),
-		( 'resources' , mkdir   ),
-		( '.'         , to_repo ),
+		( 'provides.m4', touch   ),
+		( 'src'        , mkdir   ),
+		( 'resources'  , mkdir   ),
+		( '.'          , to_repo ),
 	)
 
 	for filename, func in tasks:
