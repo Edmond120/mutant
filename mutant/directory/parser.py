@@ -31,6 +31,18 @@ def read_options(path):
 		options.append(option)
 	return options
 
+def read_provides(path):
+	"""
+	Runs a provides.m4 file through m4 and returns a list containing each
+	option.
+
+	A provides.m4 file has the same format as an options.m4 file.
+
+	Arguments:
+		path: a pathlib.Path object that represents a provides.m4 file.
+	"""
+	return read_options(path)
+
 def read_repos(path):
 	"""
 	Reads a repos file and returns a list of directories with values

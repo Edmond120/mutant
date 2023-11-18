@@ -12,6 +12,15 @@ class TestParser:
 			'dogs_1', 'dogs_2', 'dogs_3',
 		]
 
+	def test_read_provides(self):
+		provides_file = Path('testdata/files/provides.m4')
+		assert provides_file.is_file()
+		assert parser.read_provides(provides_file) == [
+			'fish_1', 'fish_2', 'fish_3',
+			'cats_1', 'cats_2', 'cats_3',
+			'dogs_1', 'dogs_2', 'dogs_3',
+		]
+
 	def test_read_repos(self):
 		repos_file = Path('testdata/files/config_repos')
 		assert repos_file.is_file()
