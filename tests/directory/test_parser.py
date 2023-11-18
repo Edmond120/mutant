@@ -3,9 +3,8 @@ from mutant.directory import parser
 from mutant.exceptions import ConfigFileError
 
 class TestParser:
-	def test_read_options(self, create_testdir):
-		tmpdir = create_testdir('parse_options')
-		options_file = Path('dotfiles/config/options.m4')
+	def test_read_options(self):
+		options_file = Path('testdata/files/options.m4')
 		assert options_file.is_file()
 		assert parser.read_options(options_file) == [
 			'fish_1', 'fish_2', 'fish_3',
