@@ -16,13 +16,8 @@ define(`@print()', `changequote
 ')
 
 define(`@println()', `changequote
-	pushdef(`@temp', defn(`@macro_output'))
-	popdef(`@macro_output')
-	pushdef(`@macro_output', defn(`@temp')`$1
-')
-	popdef(`@temp')
-	restorequote()
-')
+	print(`$1
+')restorequote()')
 
 define(`@printq()', `changequote
 	pushdef(`@temp', defn(`@macro_output'))
