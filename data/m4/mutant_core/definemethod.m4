@@ -7,30 +7,28 @@ divert(`-1')
 # Variable to hold the output of a macro
 define(`@macro_output')
 
-define(`@print()', `changequote
+define(`@print()', `
 	pushdef(`@temp', defn(`@macro_output'))
 	popdef(`@macro_output')
 	pushdef(`@macro_output', defn(`@temp')`$1')
 	popdef(`@temp')
-	restorequote()
 ')
 
-define(`@println()', `changequote
+define(`@println()', `
 	print(`$1
-')restorequote()')
+')')
 
-define(`@printq()', `changequote
+define(`@printq()', `
 	pushdef(`@temp', defn(`@macro_output'))
 	popdef(`@macro_output')
 	pushdef(`@macro_output',
 		defn(`@temp')$`'1`$1'$`'2)
 	popdef(`@temp')
-	restorequote()
 ')
 
-define(`@printqln()', `changequote
+define(`@printqln()', `
 	printq(`$1
-')restorequote()')
+')')
 
 # variables used in @define_var
 # -----------------------------
@@ -44,7 +42,7 @@ define(`@printqln()', `changequote
 define(`@definemethod_layer', 0)
 define(`@definemethod_var[0]', 0)
 
-define(`@define_var', `changequote
+define(`@define_var', `
 	ifelse(`$1', `', `
 		errprint(`empty variable name for macro `var'')
 		m4exit(1)
@@ -84,7 +82,6 @@ define(`@define_var', `changequote
 
 		pushdef(`$1', `$2')
 	')
-	restorequote
 ')
 
 # Method specs
@@ -96,11 +93,11 @@ define(`@define_var', `changequote
 #     is called.
 define(`definemethod', `changequote`'dnl
 define(`$1', `changequote`'dnl
-pushdef(`print', defn(`@print()'))dnl
-pushdef(`println', defn(`@println()'))dnl
-pushdef(`printq', defn(`@printq()'))dnl
-pushdef(`printqln', defn(`@printqln()'))dnl
-pushdef(`var', defn(`@define_var'))dnl
+pushdef(`print', `changequote`'indir(`@print()','$`'@`)restorequote()')dnl
+pushdef(`println', `changequote`'indir(`@println()','$`'@`)restorequote()')dnl
+pushdef(`printq', `changequote`'indir(`@printq()','$`'@`)restorequote()')dnl
+pushdef(`printqln', `changequote`'indir(`@printqln()','$`'@`)restorequote()')dnl
+pushdef(`var', `changequote`'indir(`@define_var','$`'@`)restorequote()')dnl
 pushdef(`@macro_output')dnl
 indir(`@remove_method_vars()')dnl
 define(`@definemethod_layer', incr(defn(`@definemethod_layer')))dnl
