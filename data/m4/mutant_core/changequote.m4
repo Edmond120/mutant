@@ -17,6 +17,10 @@ divert(-1)
 #     @quotestack[end]
 #     @quotestack[defaultquote()]
 #     @quotestack[isdefault]
+define(`@quotestack[start]')
+define(`@quotestack[end]')
+define(`@quotestack[defaultquote()]')
+define(`@quotestack[isdefault]', `true')
 
 # defaultquote:
 #   Sets the quotes back to `' but does not pop the stack.
