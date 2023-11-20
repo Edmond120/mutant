@@ -24,6 +24,19 @@ define(`@println()', `changequote
 	restorequote()
 ')
 
+define(`@printq()', `changequote
+	pushdef(`@temp', defn(`@macro_output'))
+	popdef(`@macro_output')
+	pushdef(`@macro_output',
+		defn(`@temp')$`'1`$1'$`'2)
+	popdef(`@temp')
+	restorequote()
+')
+
+define(`@printqln()', `changequote
+	printq(`$1
+')restorequote()')
+
 # variables used in @define_var
 # -----------------------------
 # arrays are indexed starting at 1
@@ -83,10 +96,15 @@ define(`@define_var', `changequote
 #   - Output is ignored except for first argument in print()
 #   - Quotes are `'
 #   - No unquoted dangling parentheses (due to implementation)
+#   - Print buffer is a macro and will be called with args 1 & 2
+#     being the start and end quotes of the scope where the method
+#     is called.
 define(`definemethod', `changequote`'dnl
 define(`$1', `changequote`'dnl
 pushdef(`print', defn(`@print()'))dnl
 pushdef(`println', defn(`@println()'))dnl
+pushdef(`printq', defn(`@printq()'))dnl
+pushdef(`printqln', defn(`@printqln()'))dnl
 pushdef(`var', defn(`@define_var'))dnl
 pushdef(`@macro_output')dnl
 indir(`@remove_method_vars()')dnl
@@ -128,7 +146,20 @@ popdef(defn(`@definemethod_var[$1][$2]'))dnl
 indir(`@method_vars_loop()', `$1', decr(`$2'), `$3')')')
 
 # Discard arguments and output @macro_output instead
-define(`@method_return()', `changequote`'dnl
+# Quotes from the outside scope are passed as arguments
+# to the output macro.
+define(`@method_return()', `defaultquote`'dnl
+pushdef(`quote_isdefault', defn(`@quotestack[isdefault]'))dnl
+ifelse(defn(`quote_isdefault'), `true', `dnl
+builtin(`changequote', `[', `]')dnl
+pushdef([quote_start], [`])dnl
+pushdef([quote_end], ['])dnl
+builtin([changequote], [`], ['])dnl
+',`dnl
+pushdef(`quote_start', defn(`@quotestack[start]'))dnl
+pushdef(`quote_end', defn(`@quotestack[end]'))dnl
+')dnl
+changequote`'dnl
 indir(`@remove_method_vars()')dnl
 dnl
 indir(`@clean_definemethod_var()', defn(`@definemethod_layer'),
@@ -139,12 +170,32 @@ indir(`@apply_method_vars()')dnl
 pushdef(`func', defn(`@macro_output'))dnl
 dnl
 func(
-popdef(`func')
-popdef(`@macro_output')
-popdef(`print')
-popdef(`println')
-popdef(`var')
-restorequote
+ifelse(defn(`quote_isdefault'), `true', `dnl
+changequote(`[',`]')dnl
+defn([quote_start]),
+defn([quote_end]),
+',`dnl
+format(`dnl
+changequote(`!'defn(`quote_start'), `!'defn(`quote_end'))dnl
+defn(%squote_start%s),
+defn(%squote_end%s),
+',
+`!'defn(`quote_start'), `!'defn(`quote_end'),
+`!'defn(`quote_start'), `!'defn(`quote_end'),
+)')dnl
+
+	restorequote
+	popdef(`func')
+	popdef(`@macro_output')
+	popdef(`quote_start')
+	popdef(`quote_end')
+	popdef(`quote_isdefault')
+	popdef(`print')
+	popdef(`println')
+	popdef(`printq')
+	popdef(`printqln')
+	popdef(`var')
+	restorequote,
 )')
 
 define(`@clean_definemethod_var()', `dnl

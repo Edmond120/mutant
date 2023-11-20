@@ -95,6 +95,44 @@ class TestMutantCoreDefinemethod(MutantCoreTester):
 		"""
 		assert self.m4_match(input_str, output_str)
 
+	def test_definemethod_printq(self):
+		input_str = """
+		define(`hello', `HELLO')dnl
+		definemethod(`double_quoted', `
+			printq(`hello')
+		')dnl
+		double_quoted
+		changequote(`<', `>')dnl
+		double_quoted
+		"""
+		output_str = """
+			hello
+			hello
+		"""
+		assert self.m4_match(input_str, output_str)
+
+	def test_definemethod_printqln(self):
+		input_str = """
+		define(`hello', `HELLO')dnl
+		definemethod(`double_quoted', `
+			print(`A')printqln(`hello')
+			printqln(`hello')
+			print(`...')
+		')dnl
+		double_quoted
+		changequote(<, >)dnl
+		double_quoted
+		changequote(!, !)dnl
+		double_quoted
+		changequote([, ])dnl
+		double_quoted
+		"""
+		output_str = 4 * """
+			Ahello
+			hello
+			..."""
+		assert self.m4_match(input_str, output_str)
+
 	def test_definemethod_nested_call(self):
 		input_str = """
 		definemethod(`first', `
