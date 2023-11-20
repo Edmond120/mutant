@@ -153,3 +153,38 @@ class TestMutantCoreDefinemethod(MutantCoreTester):
 			layer 1
 		"""
 		assert self.m4_match(input_str, output_str)
+
+	def test_definemethod_return(self):
+		input_str = """
+			definemethod(`early_exit', `
+				print(`one')
+				return
+				print(`two')
+			')dnl
+			early_exit
+		"""
+		output_str = """
+			one
+		"""
+		assert self.m4_match(input_str, output_str)
+
+	def test_definemethod_nested_return(self):
+		input_str = """
+			definemethod(`layer_one', `
+				println(`one')
+				print(layer_two)
+				return
+				print(`error')
+			')dnl
+			definemethod(`layer_two', `
+				print(`two')
+				return
+				print(`error')
+			')dnl
+			layer_one
+		"""
+		output_str = """
+			one
+			two
+		"""
+		assert self.m4_match(input_str, output_str)

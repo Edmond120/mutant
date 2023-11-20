@@ -4,6 +4,11 @@ include(`mutant_core/changequote.m4')dnl
 include(`mutant_core/divert.m4')dnl
 divert(`-1')
 
+changequote(`[',`]')
+	define([@default_start_quote], [`])
+	define([@default_end_quote], ['])
+restorequote
+
 # Variable to hold the output of a macro
 define(`@macro_output')
 
@@ -14,10 +19,6 @@ define(`@print()', `
 	popdef(`@temp')
 ')
 
-define(`@println()', `
-	print(`$1
-')')
-
 define(`@printq()', `
 	pushdef(`@temp', defn(`@macro_output'))
 	popdef(`@macro_output')
@@ -26,11 +27,11 @@ define(`@printq()', `
 	popdef(`@temp')
 ')
 
-define(`@printqln()', `
-	printq(`$1
-')')
+define(`@return()', `
+	indir(`@default_start_quote')
+')
 
-# variables used in @define_var
+# variables used in @var()
 # -----------------------------
 # arrays are indexed starting at 1
 # @definemethod_layer = recursion depth
@@ -42,7 +43,7 @@ define(`@printqln()', `
 define(`@definemethod_layer', 0)
 define(`@definemethod_var[0]', 0)
 
-define(`@define_var', `
+define(`@var()', `
 	ifelse(`$1', `', `
 		errprint(`empty variable name for macro `var'')
 		m4exit(1)
@@ -91,13 +92,19 @@ define(`@define_var', `
 #   - Print buffer is a macro and will be called with args 1 & 2
 #     being the start and end quotes of the scope where the method
 #     is called.
+define(`@definemethod_count', `0')
+
 define(`definemethod', `changequote`'dnl
-define(`$1', `changequote`'dnl
-pushdef(`print', `changequote`'indir(`@print()','$`'@`)restorequote()')dnl
-pushdef(`println', `changequote`'indir(`@println()','$`'@`)restorequote()')dnl
-pushdef(`printq', `changequote`'indir(`@printq()','$`'@`)restorequote()')dnl
-pushdef(`printqln', `changequote`'indir(`@printqln()','$`'@`)restorequote()')dnl
-pushdef(`var', `changequote`'indir(`@define_var','$`'@`)restorequote()')dnl
+dnl
+dnl # setup indir
+dnl
+define(`@definemethod_count', incr(defn(`@definemethod_count')))dnl
+define(`$1', format(``defaultquote`'indir(`@definemethod_method[%d]',$%s)'', defn(`@definemethod_count'), `@'))dnl
+dnl
+dnl # definemethod
+dnl
+define(format(``@definemethod_method[%d]'',defn(`@definemethod_count')), `changequote`'dnl
+indir(`@method_macros')dnl
 pushdef(`@macro_output')dnl
 indir(`@remove_method_vars()')dnl
 define(`@definemethod_layer', incr(defn(`@definemethod_layer')))dnl
@@ -105,9 +112,22 @@ format(`define(`@definemethod_var[%s]', 0)',
 	defn(`@definemethod_layer'))dnl
 indir(`@method_return()',
 $2
+return
+'indir(`@default_end_quote')`
 restorequote
 )')dnl
 restorequote()dnl
+')
+
+define(`@method_macros', `dnl
+pushdef(`print',  `changequote`'indir(`@print()',' $`'@`)restorequote()')dnl
+pushdef(`printq', `changequote`'indir(`@printq()','$`'@`)restorequote()')dnl
+pushdef(`return', `changequote`'indir(`@return()','$`'@`)restorequote()')dnl
+pushdef(`var',    `changequote`'indir(`@var()','   $`'@`)restorequote()')dnl
+pushdef(`println', format(``print(`$%d
+')'',`1'))dnl
+pushdef(`printqln', format(``printq(`$%d
+')'',`1'))dnl
 ')
 
 define(`@apply_method_vars()', `dnl
