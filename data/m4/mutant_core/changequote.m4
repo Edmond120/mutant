@@ -17,10 +17,13 @@ divert(-1)
 #     @quotestack[end]
 #     @quotestack[defaultquote()]
 #     @quotestack[isdefault]
+define(`@init_quotestack', `dnl
 define(`@quotestack[start]')
 define(`@quotestack[end]')
 define(`@quotestack[defaultquote()]')
 define(`@quotestack[isdefault]', `true')
+')
+indir(`@init_quotestack')
 
 # defaultquote:
 #   Sets the quotes back to `' but does not pop the stack.
@@ -36,28 +39,33 @@ define(`defaultquote')
 #   The ability to disable quoting is not allowed.
 
 define(`changequote', `defaultquote`'dnl
-dnl
-ifelse(`$#', `0', `dnl
-pushdef(`@quotestack[start]')dnl
+ifelse(`$#', `0', `indir(`@changequote_0arg')',
+`$#', `1', `indir(`@changequote_1arg')',
+len(`$1'), `0', `indir(`@changequote_empty_arg')',
+len(`$2'), `0', `indir(`@changequote_empty_arg')',
+`indir(`@changequote_2arg', `$1', `$2')')dnl
+')
+
+define(`@changequote_0arg',
+`pushdef(`@quotestack[start]')dnl
 pushdef(`@quotestack[end]')dnl
 pushdef(`@quotestack[defaultquote()]')dnl
 pushdef(`@quotestack[isdefault]', `true')dnl
 define(`defaultquote')dnl
 builtin(`changequote')dnl
-',
-`$#', `1', `errprint(
+')
+
+define(`@changequote_1arg', `errprint(
 `ERROR: '__program__:__file__:__line__:`
 	mutant changequote requires 0 or 2 arguments
-')m4exit(1)',
-len(`$1'), `0', `errprint(
+')m4exit(1)')
+
+define(`@changequote_empty_arg', `errprint(
 `ERROR: '__program__:__file__:__line__:`
 	mutant changequote does not except void arguments
-')m4exit(1)',
-len(`$2'), `0', `errprint(
-`ERROR: '__program__:__file__:__line__:`
-	mutant changequote does not except void arguments
-')m4exit(1)',
-`dnl
+')m4exit(1)')
+
+define(`@changequote_2arg', `dnl
 define(`defaultquote', `dnl
 builtin($1changequote$2)dnl
 define(`defaultquote')dnl
@@ -66,34 +74,32 @@ pushdef(`@quotestack[start]', `$1')dnl
 pushdef(`@quotestack[end]', `$2')dnl
 pushdef(`@quotestack[defaultquote()]', defn(`defaultquote'))dnl
 pushdef(`@quotestack[isdefault]', `false')dnl
-dnl
 builtin(`changequote', `$1', `$2')dnl
-')dnl
 ')
 
 # restorequote:
 #   Pops the stack and changes the quotes to the ones that are
 #   now on the top of the stack.
 define(`restorequote', `defaultquote`'dnl
-ifdef(`@quotestack[start]', `dnl
 popdef(`@quotestack[start]')dnl
 popdef(`@quotestack[end]')dnl
 popdef(`@quotestack[defaultquote()]')dnl
 popdef(`@quotestack[isdefault]')dnl
 ifdef(`@quotestack[start]', `dnl
-ifelse(defn(`@quotestack[isdefault]'), `false', `dnl
-define(`defaultquote', defn(`@quotestack[defaultquote()]'))dnl
-pushdef(@, defn(`@quotestack[start]'))dnl
-pushdef(@@, defn(`@quotestack[end]'))dnl
-builtin(`changequote', defn(@), defn(@@))dnl
-popdef(@)dnl
-popdef(@@)dnl
-', `dnl
+ifelse(defn(`@quotestack[isdefault]'), `false',
+`indir(`@restorequote_nondefault')',
+`dnl
 define(`defaultquote')dnl
 builtin(`changequote')dnl
 ')dnl
-')dnl
-')dnl
+', `indir(`@init_quotestack')')dnl
+')
+
+define(`@restorequote_nondefault', `dnl
+define(`defaultquote', defn(`@quotestack[defaultquote()]'))dnl
+builtin(`changequote',
+defn(`@quotestack[start]'),
+defn(`@quotestack[end]'))dnl
 ')
 
 divert(0)dnl
