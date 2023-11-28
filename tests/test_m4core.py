@@ -3,6 +3,8 @@ from mutant import m4core
 from mutant.exceptions import M4Error
 
 class TestM4core:
+	sample_preclude = "hello world\n"
+
 	sample_input = '\n'.join((
 		"define(`swap', `$2 $1')dnl",
 		"swap(`two', `one')",
@@ -11,13 +13,14 @@ class TestM4core:
 	))
 
 	sample_correct_output = '\n'.join((
+		'hello world',
 		'one two',
 		'three four',
 		'five six',
 	))
 
 	def test_M4_pipe(self):
-		m4 = m4core.M4()
+		m4 = m4core.M4(preclude=self.sample_preclude)
 		output_str = m4.pipe(self.sample_input)
 		assert output_str == self.sample_correct_output
 
@@ -25,7 +28,7 @@ class TestM4core:
 		test_file = tmp_path.joinpath('test.m4')
 		with open(test_file, 'w') as file:
 			file.write(self.sample_input)
-		m4 = m4core.M4()
+		m4 = m4core.M4(preclude=self.sample_preclude)
 		output_str = m4.pipe_file(test_file)
 		assert output_str == self.sample_correct_output
 

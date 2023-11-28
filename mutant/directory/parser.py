@@ -24,7 +24,7 @@ def read_options(path):
 	Arguments:
 		path: a pathlib.Path object that represents an options.m4 file.
 	"""
-	m4 = m4core.M4()
+	m4 = m4core.M4(preclude="include(`mutant_core.m4')dnl")
 	data = m4.pipe_file(path)
 
 	options = []
@@ -53,7 +53,7 @@ def read_provides(path):
 	Arguments:
 		path: a pathlib.Path object that represents a provides.m4 file.
 	"""
-	m4 = m4core.M4()
+	m4 = m4core.M4(preclude="include(`mutant_core.m4')dnl")
 	data = m4.pipe_file(path)
 
 	entries = []

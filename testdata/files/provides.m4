@@ -9,7 +9,9 @@
 # Ex.
 #     syscmd(`qlist -I | sed "s/^/pack:/"')
 
-define(`DEFAULT', `ten eleven')
+definemethod(`DEFAULT', `
+	print(`ten eleven')
+')
 
 one two three -> four
 five six seven -> eight nine

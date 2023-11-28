@@ -31,6 +31,8 @@ class M4:
 			of the standard python library.
 			VALUE represents the soft limit that will be set for
 			m4.
+		preclude:
+			string that is prepended to what is piped to m4.
 	"""
 
 	default_flags = (
@@ -45,10 +47,12 @@ class M4:
 		(resource.RLIMIT_STACK, _kilobytes(8192)),
 	)
 
-	def __init__(self, *, flags=default_flags, rlimits=default_rlimits, size_limit=(-1, -1)):
+	def __init__(self, *, flags=default_flags, rlimits=default_rlimits,
+			size_limit=(-1, -1), preclude=''):
 		self.flags = list(flags)
 		self.rlimits = list(rlimits)
 		self.size_limit = size_limit
+		self.preclude = preclude
 
 	def __pipe(self, string):
 		"""
@@ -71,6 +75,7 @@ class M4:
 		return (process.stdout, process.stderr)
 
 	def pipe(self, string, *, stdout_only=True):
+		string = self.preclude + string
 		if stdout_only:
 			return self.__pipe(string)[0]
 		else:
