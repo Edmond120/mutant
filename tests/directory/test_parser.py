@@ -16,9 +16,18 @@ class TestParser:
 		provides_file = Path('testdata/files/provides.m4')
 		assert provides_file.is_file()
 		assert parser.read_provides(provides_file) == [
-			'fish_1', 'fish_2', 'fish_3',
-			'cats_1', 'cats_2', 'cats_3',
-			'dogs_1', 'dogs_2', 'dogs_3',
+			{
+				'conditions' : ['one', 'two', 'three'],
+				'provides' : ['four']
+			},
+			{
+				'conditions' : ['five', 'six', 'seven'],
+				'provides' : ['eight', 'nine'],
+			},
+			{
+				'conditions' : [],
+				'provides' : ['ten', 'eleven']
+			}
 		]
 
 	def test_read_repos(self):

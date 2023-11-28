@@ -6,6 +6,12 @@ import configparser
 from mutant import m4core
 from mutant.exceptions import ConfigFileError
 
+def _get_valid_lines(data):
+	return filter(
+		lambda l: len(l) > 0 and l[0] != '#',
+		map(lambda s: s.strip(), data.split('\n'))
+	)
+
 def read_options(path):
 	"""
 	Runs an options.m4 file through m4 and returns a list containing each
@@ -21,11 +27,8 @@ def read_options(path):
 	m4 = m4core.M4()
 	data = m4.pipe_file(path)
 
-	lines = filter(len, map(lambda s: s.strip(), data.split('\n')))
 	options = []
-	for line in lines:
-		if line[0] == '#':
-			continue
+	for line in _get_valid_lines(data):
 		words = line.split()
 		option = words[0]
 		options.append(option)
@@ -33,15 +36,43 @@ def read_options(path):
 
 def read_provides(path):
 	"""
-	Runs a provides.m4 file through m4 and returns a list containing each
-	option.
+	Runs a provides.m4 file through m4 containing provide rules.
+	Returns a list in the form of
+		{
+			'conditions': [<option>, ...],
+			'provides': [<option>, ...]
+		}
+	Provide rules are in the form of "<options> -> <options>" where
+	<options> are whitespace separated options. Options to the left
+	are conditions where when satisfied will enable the options to
+	the right. If there is no arrow then the options are assumed
+	to be to the right of an arrow.
 
-	A provides.m4 file has the same format as an options.m4 file.
+	Ex. one two -> three
 
 	Arguments:
 		path: a pathlib.Path object that represents a provides.m4 file.
 	"""
-	return read_options(path)
+	m4 = m4core.M4()
+	data = m4.pipe_file(path)
+
+	entries = []
+	for line in _get_valid_lines(data):
+		words = line.split()
+		if '->' in words:
+			arrow = words.index('->')
+			conditions = words[:arrow]
+			provides = words[arrow+1:]
+			entries.append({
+				'conditions' : conditions,
+				'provides' : provides,
+			})
+		else:
+			entries.append({
+				'conditions' : [],
+				'provides' : words
+			})
+	return entries
 
 def read_repos(path):
 	"""

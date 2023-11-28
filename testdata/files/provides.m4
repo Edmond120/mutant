@@ -9,12 +9,8 @@
 # Ex.
 #     syscmd(`qlist -I | sed "s/^/pack:/"')
 
-define(`vers_123', `
-$1_1
-$1_2
-$1_3
-')
+define(`DEFAULT', `ten eleven')
 
-vers_123(fish)
-vers_123(cats)
-vers_123(dogs)
+one two three -> four
+five six seven -> eight nine
+DEFAULT
