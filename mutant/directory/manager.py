@@ -14,3 +14,9 @@ class MutantDirectory:
 
 	def __init__(self, path):
 		self.path = path
+
+		path_str = path.absolute().as_posix()
+		if not path.exists():
+			raise FileNotFoundError(f'Mutant directory not found: {path_str}')
+		if not path.is_dir():
+			raise NotADirectoryError(f'Error: {path_str} is not a directory')
