@@ -23,3 +23,7 @@ class MutantDirectory:
 
 	def clone_repos(self):
 		creator.clone_repos(self.path)
+
+	def create_mutation(self, name, *, remote=''):
+		mutation_dir_path = self.path.joinpath('repos', name)
+		creator.create_mutation_dir(mutation_dir_path, remote=remote)

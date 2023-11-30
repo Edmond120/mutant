@@ -33,5 +33,14 @@ class TestManager:
 			'zsh',
 		)
 		for name in repo_names:
-			repo = mutant_dir.path.joinpath('repos').joinpath(name)
+			repo = mutant_dir.path.joinpath('repos', name)
 			assert repo in cloned_repos
+
+	def test_manager_wrapper_create_mutation(self, tmp_path):
+		mutant_dir = MutantDirectory.create(tmp_path.joinpath('dotfiles'))
+		mutant_dir.create_mutation('my_config_repo')
+		repo = mutant_dir.path.joinpath('repos/my_config_repo')
+		assert repo.joinpath('resources').is_dir()
+		assert repo.joinpath('src').is_dir()
+		assert repo.joinpath('provides.m4').is_file()
+		assert repo.joinpath('.git').is_dir()
