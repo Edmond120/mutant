@@ -20,3 +20,6 @@ class MutantDirectory:
 			raise FileNotFoundError(f'Mutant directory not found: {path_str}')
 		if not path.is_dir():
 			raise NotADirectoryError(f'Error: {path_str} is not a directory')
+
+	def clone_repos(self):
+		creator.clone_repos(self.path)
