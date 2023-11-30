@@ -31,7 +31,7 @@ def setup_repos(repos_path):
 		init_git_repo(repo)
 
 @pytest.fixture()
-def create_testdir(tmp_path, monkeypatch):
+def create_testdir(tmp_path):
 	"""
 	Creates a test mutant directory and overlays another
 	directory tree on top of it.
@@ -50,6 +50,5 @@ def create_testdir(tmp_path, monkeypatch):
 		shutil.copytree(pathlib.Path('testdata/repos'), tmp_repos_path)
 		setup_repos(tmp_repos_path)
 
-		monkeypatch.chdir(tmp_path)
 		return tmp_path
 	return create_dir_func

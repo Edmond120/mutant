@@ -20,8 +20,9 @@ class TestCreator:
 		for path, test in files:
 			assert test(mutant_dir.joinpath(path))
 
-	def test_clone_repos(self, create_testdir):
+	def test_clone_repos(self, create_testdir, monkeypatch):
 		testdir = create_testdir('repo_clone')
+		monkeypatch.chdir(testdir)
 		dotfiles = testdir.joinpath('dotfiles')
 		repos = dotfiles.joinpath('repos')
 		creator.clone_repos(dotfiles)

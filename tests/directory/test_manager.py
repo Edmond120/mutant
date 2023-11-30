@@ -23,8 +23,9 @@ class TestManager:
 		except NotADirectoryError:
 			pass
 
-	def test_manager_wrapper_clone_repos(self, create_testdir):
+	def test_manager_wrapper_clone_repos(self, create_testdir, monkeypatch):
 		testdir = create_testdir('clone')
+		monkeypatch.chdir(testdir)
 		mutant_dir_path = testdir.joinpath('dotfiles')
 		mutant_dir = MutantDirectory(mutant_dir_path)
 		mutant_dir.clone_repos()
