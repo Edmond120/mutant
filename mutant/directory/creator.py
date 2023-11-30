@@ -41,7 +41,7 @@ def _to_repo(repo_path, *, remote=''):
 
 	if remote:
 		subprocess.run(
-			( 'git', 'remote', 'add', 'origin', remote ),
+			( 'git', 'remote', 'add', '--', 'origin', remote ),
 			cwd=repo_path,
 		)
 
