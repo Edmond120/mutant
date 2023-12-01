@@ -23,7 +23,7 @@ class TestManager:
 		except NotADirectoryError:
 			pass
 
-	def test_manager_wrapper_clone_repos(self, create_testdir, monkeypatch):
+	def test_mutant_directory_wrapper_clone_repos(self, create_testdir, monkeypatch):
 		testdir = create_testdir('clone')
 		monkeypatch.chdir(testdir)
 		mutant_dir_path = testdir.joinpath('dotfiles')
@@ -37,7 +37,7 @@ class TestManager:
 			repo = mutant_dir.path.joinpath('repos', name)
 			assert repo in cloned_repos
 
-	def test_manager_wrapper_create_mutation(self, tmp_path):
+	def test_mutant_directory_wrapper_create_mutation(self, tmp_path):
 		mutant_dir = MutantDirectory.create(tmp_path.joinpath('dotfiles'))
 		mutant_dir.create_mutation('my_config_repo')
 		repo = mutant_dir.path.joinpath('repos/my_config_repo')
