@@ -21,7 +21,7 @@ class TestCreator:
 			assert test(mutant_dir.joinpath(path))
 
 	def test_clone_repos(self, create_testdir):
-		testdir = create_testdir('clone')
+		testdir = create_testdir('repo_clone')
 		dotfiles = testdir.joinpath('dotfiles')
 		repos = dotfiles.joinpath('repos')
 		creator.clone_repos(dotfiles)
