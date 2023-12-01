@@ -5,15 +5,17 @@ import subprocess
 import mutant
 
 def apply_overlay(overlay, target):
-	if not ( overlay.exists() and target.exists() ):
+	if not overlay.exists():
 		raise FileNotFoundError('unable to apply overlay')
 	if overlay.is_dir():
-		if not target.is_dir():
+		if not target.exists():
+			target.mkdir()
+		elif not target.is_dir():
 			raise NotADirectoryError('target is not a directory')
 		for item in overlay.iterdir():
 			apply_overlay(item, target.joinpath(item.name))
 	else: # overlay is a file
-		if not target.is_file():
+		if target.exists() and not target.is_file():
 			raise IsADirectoryError('target is not a file')
 		shutil.copyfile(overlay, target)
 
