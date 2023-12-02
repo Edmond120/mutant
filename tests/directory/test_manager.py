@@ -45,3 +45,28 @@ class TestManager:
 		assert repo.joinpath('src').is_dir()
 		assert repo.joinpath('provides.m4').is_file()
 		assert repo.joinpath('.git').is_dir()
+
+	def test_mutant_directory_eval_options(self, create_testdir):
+		mutant_dir = MutantDirectory(
+			create_testdir('options')
+			.joinpath('dotfiles')
+		)
+
+		options = mutant_dir.eval_options()
+		assert options == set((
+			'option_A',
+			'option_B',
+			'option_C',
+			'zsh_option_A',
+			'zsh_option_B',
+			'zsh_option_C',
+			'provided_A',
+			'provided_B',
+			'provided_C',
+			'provided_D',
+			'provided_AB',
+			'provided_zsh_AB',
+			'zsh_m4_option_A',
+			'zsh_m4_option_B',
+			'zsh_m4_option_AB',
+		))
