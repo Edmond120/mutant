@@ -54,7 +54,7 @@ class M4:
 		self.size_limit = size_limit
 		self.preclude = preclude
 
-	def __pipe(self, string):
+	def __pipe(self, string, *, cwd=None):
 		"""
 		Pipes a string through m4 and returns the output.
 		"""
@@ -65,6 +65,7 @@ class M4:
 			rlimits = self.rlimits,
 			stdin = string,
 			output_limits = self.size_limit,
+			cwd = cwd,
 		)
 		process.start()
 		if process.returncode != 0:
@@ -74,12 +75,12 @@ class M4:
 			)))
 		return (process.stdout, process.stderr)
 
-	def pipe(self, string, *, stdout_only=True):
+	def pipe(self, string, *, stdout_only=True, cwd=None):
 		string = self.preclude + string
 		if stdout_only:
-			return self.__pipe(string)[0]
+			return self.__pipe(string, cwd=cwd)[0]
 		else:
-			return self.__pipe(string)
+			return self.__pipe(string, cwd=cwd)
 
 	def pipe_file(self, path):
 		"""
@@ -89,4 +90,4 @@ class M4:
 			path: string that is the path to a file.
 		"""
 		with open(path, 'r') as file:
-			return self.pipe(file.read())
+			return self.pipe(file.read(), cwd=path.parent)

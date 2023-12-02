@@ -1,4 +1,5 @@
 import resource
+from pathlib import Path
 from mutant import m4core
 from mutant.exceptions import M4Error
 
@@ -72,3 +73,8 @@ class TestM4core:
 		input_str = "syscmd(`echo this is stderr >&2')"
 		stderr = m4.pipe(input_str, stdout_only=False)[1]
 		assert stderr == 'this is stderr\n'
+
+	def test_M4_file_relative_cwd(self):
+		m4 = m4core.M4()
+		testfile = Path('testdata/files/relative_cwd.m4')
+		assert m4.pipe_file(testfile) == "hello world\n"

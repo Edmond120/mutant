@@ -20,7 +20,7 @@ class LimitedProcess:
 		LimitExceededError
 	"""
 
-	def __init__(self, args, *, rlimits=(), stdin=None, output_limits=(-1, -1)):
+	def __init__(self, args, *, rlimits=(), stdin=None, output_limits=(-1, -1), cwd=None):
 		"""
 		Arguments:
 			args: iterable of strings
@@ -44,6 +44,7 @@ class LimitedProcess:
 		self.pid = None
 		self.returncode = None
 		self.errors = []
+		self.cwd = cwd
 
 	def start(self):
 		process = subprocess.Popen(
@@ -53,6 +54,7 @@ class LimitedProcess:
 			stderr=subprocess.PIPE,
 			text=True,
 			preexec_fn=lambda: self._set_limits(),
+			cwd=self.cwd,
 		)
 		self.pid = process.pid
 		self._communicate(process)
