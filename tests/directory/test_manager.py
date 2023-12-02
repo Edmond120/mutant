@@ -24,7 +24,7 @@ class TestManager:
 			pass
 
 	def test_mutant_directory_wrapper_clone_repos(self, create_testdir, monkeypatch):
-		testdir = create_testdir('clone')
+		testdir = create_testdir('repo_clone')
 		monkeypatch.chdir(testdir)
 		mutant_dir_path = testdir.joinpath('dotfiles')
 		mutant_dir = MutantDirectory(mutant_dir_path)
