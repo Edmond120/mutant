@@ -27,10 +27,6 @@ define(`@printq()', `
 	popdef(`@temp')
 ')
 
-define(`@return()', `
-	indir(`@default_start_quote')
-')
-
 # variables used in @var()
 # -----------------------------
 # arrays are indexed starting at 1
@@ -120,9 +116,9 @@ restorequote()dnl
 ')
 
 define(`@method_macros', `dnl
+pushdef(`return', `indir(`@default_start_quote')')dnl
 pushdef(`print',  `changequote`'indir(`@print()',' $`'@`)restorequote()')dnl
 pushdef(`printq', `changequote`'indir(`@printq()','$`'@`)restorequote()')dnl
-pushdef(`return', `changequote`'indir(`@return()','$`'@`)restorequote()')dnl
 pushdef(`var',    `changequote`'indir(`@var()','   $`'@`)restorequote()')dnl
 pushdef(`println', format(``print(`$%d
 ')'',`1'))dnl
@@ -207,7 +203,7 @@ defn(%squote_end%s),
 	popdef(`printq')
 	popdef(`printqln')
 	popdef(`var')
-	restorequote,
+	restorequote
 )')
 
 define(`@clean_definemethod_var()', `dnl

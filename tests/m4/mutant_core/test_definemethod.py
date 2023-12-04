@@ -188,3 +188,21 @@ class TestMutantCoreDefinemethod(MutantCoreTester):
 			two
 		"""
 		assert self.m4_match(input_str, output_str)
+
+	def test_definemethod_balanced_quotes(self):
+		"Test to ensure that for every internal changequote there is a restorequote"
+		input_str = """
+			definemethod(`balanced', `print(`$1')')dnl
+			changequote(`[',`]')dnl
+			balanced([`hello world'])
+			[hello world]
+			`hello world'
+			[`hello world']
+		"""
+		output_str = """
+			`hello world'
+			hello world
+			`hello world'
+			`hello world'
+		"""
+		assert self.m4_match(input_str, output_str)
