@@ -120,10 +120,10 @@ pushdef(`return', `indir(`@default_start_quote')')dnl
 pushdef(`print',  `changequote`'indir(`@print()',' $`'@`)restorequote()')dnl
 pushdef(`printq', `changequote`'indir(`@printq()','$`'@`)restorequote()')dnl
 pushdef(`var',    `changequote`'indir(`@var()','   $`'@`)restorequote()')dnl
-pushdef(`println', format(``print(`$%d
-')'',`1'))dnl
-pushdef(`printqln', format(``printq(`$%d
-')'',`1'))dnl
+pushdef(`println', format(``changequote`'print(`$%d
+')restorequote()'',`1'))dnl
+pushdef(`printqln', format(``changequote`'printq(`$%d
+')restorequote()'',`1'))dnl
 ')
 
 define(`@apply_method_vars()', `dnl
