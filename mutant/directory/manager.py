@@ -1,5 +1,7 @@
+from itertools import chain
 from mutant.directory import creator
 from mutant.directory import parser
+from mutant.m4core import M4
 
 class MutantDirectory:
 	"""
@@ -46,6 +48,26 @@ class MutantDirectory:
 		)
 
 		return options
+
+	def eval_template(self, template_string, *, options=None, include_dirs=(), cwd=None):
+		if options is None:
+			options = self.eval_options()
+
+		option_flags = tuple((
+			f'--define=option[{index}]={option}'
+			for index, option in enumerate(options)
+		))
+
+		include_flags = tuple((
+			f'--include={path.absolute().as_posix()}'
+			for path in include_dirs
+		))
+
+		m4 = M4(
+			flags = M4.default_flags + option_flags + include_flags,
+			preclude = "include(`mutant_template_toplevel.m4')dnl\n"
+		)
+		return m4.pipe(template_string, cwd=cwd)
 
 	@staticmethod
 	def __solve_provide_rules(provide_rules, starting_options=tuple()):

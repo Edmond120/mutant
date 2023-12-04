@@ -70,3 +70,49 @@ class TestMutantDirectory:
 			'zsh_m4_option_B',
 			'zsh_m4_option_AB',
 		))
+
+	def test_eval_template(self, create_testdir):
+		mutant_dir = MutantDirectory(
+			create_testdir('template')
+			.joinpath('dotfiles')
+		)
+
+		assert mutant_dir.eval_template(
+			"definemethod(`mymacro', `printq(`hello world')')mymacro"
+		) == "hello world"
+
+	def test_eval_template_options(self, create_testdir):
+		mutant_dir = MutantDirectory(
+			create_testdir('template')
+			.joinpath('dotfiles')
+		)
+
+		# options are obtained by mutant_dir.eval_options
+		tests = (
+			( "option(`optionA', 1)" , '1' ),
+			( "option(`optionB', 2)", '2' ),
+			( "option(`ignore_equal_sign=foo', 3)", '3' ),
+			( "option(`bar', 4)", '4' ),
+		)
+		test_str = '\n'.join(map(lambda x: x[0], tests))
+		result_str = '\n'.join(map(lambda x: x[1], tests))
+		assert mutant_dir.eval_template(test_str) == result_str
+
+	def test_eval_template_option_array(self, create_testdir):
+		mutant_dir = MutantDirectory(
+			create_testdir('template')
+			.joinpath('dotfiles')
+		)
+		options = mutant_dir.eval_options()
+		assert mutant_dir.eval_template(
+			"""definemethod(`option_array_length', `
+				var(`index', `$1')
+				ifelse(index, `', `var(`index', 0)')
+				ifdef(format(``option[%d]'', index), `
+					print(format(``option_array_length(`%d')'',
+						eval(index + 1)))
+				', `
+					print(index)
+				')
+			')option_array_length"""
+		) == str(len(options))

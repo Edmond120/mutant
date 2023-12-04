@@ -1,0 +1,2 @@
+optionA
+ignore_equal_sign=foo
