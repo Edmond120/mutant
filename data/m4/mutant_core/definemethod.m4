@@ -99,7 +99,7 @@ dnl
 dnl # setup indir
 dnl
 define(`@definemethod_count', incr(defn(`@definemethod_count')))dnl
-define(`$1', format(``defaultquote`'indir(`@definemethod_method[%d]',$%s)'', defn(`@definemethod_count'), `@'))dnl
+define(`$1', format(``indir(changequote`@definemethod_method[%d]'restorequote,$%s)'', defn(`@definemethod_count'), `@'))dnl
 dnl
 dnl # definemethod
 dnl
