@@ -206,3 +206,18 @@ class TestMutantCoreDefinemethod(MutantCoreTester):
 			`hello world'
 		"""
 		assert self.m4_match(input_str, output_str)
+
+	def  test_definemethod_printf(self):
+		input_str = """
+			define(`hello', `HELLO')dnl
+			definemethod(`main', `
+				printfln(`[%s %s]', `hello', `world')
+				printf(``!%s!%s!'', `hello', `world')
+			')dnl
+			main
+		"""
+		output_str = """
+			[HELLO world]
+			!hello!world!
+		"""
+		assert self.m4_match(input_str, output_str)

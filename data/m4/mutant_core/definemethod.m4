@@ -19,6 +19,13 @@ define(`@print()', `
 	popdef(`@temp')
 ')
 
+define(`@printf()', `
+	pushdef(`@temp', defn(`@macro_output'))
+	popdef(`@macro_output')
+	pushdef(`@macro_output', defn(`@temp')format(``$1'',shift($@)))
+	popdef(`@temp')
+')
+
 define(`@printq()', `
 	pushdef(`@temp', defn(`@macro_output'))
 	popdef(`@macro_output')
@@ -119,11 +126,14 @@ define(`@method_macros', `dnl
 pushdef(`return', `indir(`@default_start_quote')')dnl
 pushdef(`print',  `changequote`'indir(`@print()',' $`'@`)restorequote()')dnl
 pushdef(`printq', `changequote`'indir(`@printq()','$`'@`)restorequote()')dnl
+pushdef(`printf', `changequote`'indir(`@printf()','$`'@`)restorequote()')dnl
 pushdef(`var',    `changequote`'indir(`@var()','   $`'@`)restorequote()')dnl
 pushdef(`println', format(``changequote`'print(`$%d
 ')restorequote()'',`1'))dnl
 pushdef(`printqln', format(``changequote`'printq(`$%d
 ')restorequote()'',`1'))dnl
+pushdef(`printfln', format(``changequote`'printf(`$%d
+', shift($%s))restorequote()'',`1', `@'))dnl
 ')
 
 define(`@apply_method_vars()', `dnl
