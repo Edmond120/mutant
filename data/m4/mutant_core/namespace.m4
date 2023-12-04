@@ -107,35 +107,30 @@ ifelse(`$1', `', `',
         `dnl # create namespace if it does not exist
 define(format(``@namespace[%s]'', `$1'), `0')')')dnl
 dnl
-pushdef(`pushdef_leavenamespace', defn(`@pushdef_leavenamespace'))dnl
 ifelse(
 defn(`@thisnamespace'), `$1',
 `dnl # same namespace -> do nothing
-pushdef_leavenamespace(`', `')dnl
+indir(`@pushdef_leavenamespace', `', `')dnl
 ',
 defn(`@thisnamespace'), `',
 `dnl # coming from global namespace -> push new namespace macros
 pushdef(`applynamespace', defn(`@applynamespace'))dnl
 applynamespace(popdef(`applynamespace')`$1')dnl
-pushdef_leavenamespace(`$1', `')dnl
+indir(`@pushdef_leavenamespace', `$1', `')dnl
 ',
 `$1', `',
 `dnl # going to global namespace -> pop old namespace macros
-pushdef(`removenamespace', defn(`@removenamespace'))dnl
-removenamespace(popdef(`removenamespace')defn(`@thisnamespace'))dnl
-pushdef_leavenamespace(`', defn(`@thisnamespace'))dnl
+indir(`@removenamespace', defn(`@thisnamespace'))dnl
+indir(`@pushdef_leavenamespace', `', defn(`@thisnamespace'))dnl
 ',
 `dnl # different namespace -> pop old namespace macros, push new namespace macros
-pushdef(`removenamespace', defn(`@removenamespace'))dnl
-removenamespace(popdef(`removenamespace')defn(`@thisnamespace'))dnl
-pushdef(`applynamespace', defn(`@applynamespace'))dnl
-applynamespace(popdef(`applynamespace')`$1')dnl
-pushdef_leavenamespace(`$1', defn(`@thisnamespace'))dnl
+indir(`@removenamespace', defn(`@thisnamespace'))dnl
+indir(`@applynamespace', `$1')dnl
+indir(`@pushdef_leavenamespace', `$1', defn(`@thisnamespace'))dnl
 dnl
 ')dnl
 pushdef(`@thisnamespace', `$1')dnl
 dnl
-popdef(`pushdef_leavenamespace')dnl
 restorequote()dnl
 ')
 
@@ -152,12 +147,10 @@ restorequote()dnl
 ')dnl
 ',
 ifelse(`$1', `', `',
-``pushdef(`removenamespace', defn(`@removenamespace'))dnl
-removenamespace(popdef(`removenamespace')`$1')dnl
+``indir(`@removenamespace', `$1')dnl
 ''),
 ifelse(`$2', `', `',
-``pushdef(`applynamespace', defn(`@applynamespace'))dnl
-applynamespace(popdef(`applynamespace')`$2')dnl
+``indir(`@applynamespace', `$2')dnl
 ''))')
 
 define(`leavenamespace')
