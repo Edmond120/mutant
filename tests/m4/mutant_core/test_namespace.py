@@ -343,3 +343,104 @@ class TestMutantCoreNamespace(MutantCoreTester):
 		tuna
 		"""
 		assert self.m4_match(input_str, correct_output)
+
+	def test_namespaceimport(self):
+		input_str = """
+			enternamespace(`mypackage')dnl
+			namespacemethod(`doThing', `
+				print(``hello world'')
+			')dnl
+			namespacemethod(`log', `
+				print(``output: $1'')
+			')dnl
+			doThing
+			leavenamespace`'dnl
+			doThing
+			namespaceimport(`mypackage', `doThing', `log')dnl
+			doThing
+			log(`foobar')
+			ifelse(defn(`@thisnamespace'), `', `true')
+		"""
+		correct_output = """
+			hello world
+			doThing
+			hello world
+			output: foobar
+			true
+		"""
+		assert self.m4_match(input_str, correct_output)
+
+	def test_namespaceimport_renaming(self):
+		input_str = """
+			enternamespace(`mypackage')dnl
+			namespacemethod(`doThing', `
+				print(``hello world'')
+			')dnl
+			namespacemethod(`log', `
+				print(`output: $1')
+			')dnl
+			leavenamespace`'dnl
+			namespaceimport(`mypackage',
+				`doThing -> mypackage_doThing',
+				`log -> mypackage_log',
+			)dnl
+			mypackage_doThing
+			mypackage_log(`foobar')
+		"""
+		correct_output = """
+			hello world
+			output: foobar
+		"""
+		assert self.m4_match(input_str, correct_output)
+
+	def test_namespaceimport_inside_namespace(self):
+		input_str = """
+			enternamespace(`mypackage')dnl
+			namespacemethod(`one', `
+				println(two)
+				print(`two')
+			')dnl
+			namespacemethod(`two', `
+				print(``hello world'')
+			')dnl
+			leavenamespace`'dnl
+			enternamespace(`otherpackage')dnl
+			namespaceimport(`mypackage', `one -> five')dnl
+			five
+			leavenamespace`'dnl
+			one
+			five
+			namespaceimport(`otherpackage', `five')dnl
+			five
+		"""
+		correct_output = """
+			hello world
+			hello world
+			one
+			five
+			hello world
+			hello world
+		"""
+		assert self.m4_match(input_str, correct_output)
+
+	def test_namespaceimport_tail_recursion_support(self):
+		input_str = """
+			enternamespace(`mypackage')dnl
+			define(`enternamespace', `divert(1)`error'restoredivert()'defn(`enternamespace'))dnl
+			namespacemethod(`recur', `
+				ifelse(`$1', `', `return')
+				ifelse(eval(`$1 <= 0'), `1', `return')
+				println(``hello'')
+				print(`recur(decr(`$1'))')
+			')dnl
+			leavenamespace`'dnl
+			namespaceimport(`mypackage', `recur')dnl
+			recur(3)dnl
+			undivert()dnl # should not output "error"
+		"""
+		correct_output = """
+			hello
+			hello
+			hello
+		"""
+		assert self.m4_match(input_str, correct_output)

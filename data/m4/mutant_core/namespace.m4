@@ -68,6 +68,46 @@ undefine(`@namespacemethod_temp')dnl
 restorequote()dnl
 ')')
 
+# namespaceimport(<namespace>, <methods...>)
+definemethod(`namespaceimport', `
+	ifelse(eval(`$# < 2'), 1, `return')
+	var(`namespace', ``$1'')
+	var(`method', ``$2'')
+	ifelse(namespace, `', `return')
+	ifelse(method, `', `return')
+
+	# Check for rename operator ->
+	var(`arrow_regex', `` +-> +'')
+	var(`regex', format(``^\(.*\)%s\(.*\)$'', arrow_regex))
+	ifelse(regexp(method, arrow_regex), `-1', `
+		var(`new_name', defn(`method'))
+	', `
+		var(`new_name', regexp(method, regex, ```\2'''))
+		var(`method', regexp(method, regex, ```\1'''))
+	')
+
+	ifelse(new_name, `', `return')
+
+	var(`definition', format(``
+			enternamespace(`%s')
+			print(`%s($%s)')
+			printq()
+			print(`leavenamespace()')
+		'',
+		namespace,
+		method,
+		`@',
+	))
+
+	ifelse(defn(`@thisnamespace'), `', `
+		definemethod(new_name, defn(`definition'))
+	', `
+		namespacemethod(defn(`@thisnamespace'), new_name, defn(`definition'))
+	')
+
+	namespaceimport(namespace, shift(shift($@)))
+')
+
 define(`@namespace_loop', `dnl
 dnl # $1 = namespace
 dnl # $2 = index
