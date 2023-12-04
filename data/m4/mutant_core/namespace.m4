@@ -5,17 +5,6 @@ include(`mutant_core/divert.m4')dnl
 include(`mutant_core/definemethod.m4')dnl
 divert(`-1')
 
-# namespace method specs:
-#   Macros defined within a namespace is supposed to be "private".
-#   "public" methods should be protected by changequote, but
-#   namespaced methods should not. This is to allow namespaced
-#   methods to be optimized by tail-recursion, since adding a
-#   restorequote at the end of a macro ruins it.
-
-# Notes:
-#   cleanup all temporary macros before the expansions of macros
-#   that deal with namespaces.
-
 # If @thisnamespace is an empty string then the current namespace is
 # the global namespace. All methods defined here are "public".
 define(`@thisnamespace')
