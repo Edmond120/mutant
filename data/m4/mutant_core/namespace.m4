@@ -14,8 +14,8 @@ ifelse(eval(`$# == 1'), `1',
 `namespacedef(defn(`@thisnamespace'), `$1', `')',
 eval(`$# == 2'), `1',
 `namespacedef(defn(`@thisnamespace'), `$1', `$2')',
-dnl
-`pushdef(`namespace', `$1')dnl
+`dnl
+pushdef(`namespace', `$1')dnl
 pushdef(`macroname', `$2')dnl
 pushdef(`definition', `$3')dnl
 pushdef(`namespacemacro', format(``@namespace[%s]'', defn(`namespace')))dnl
@@ -56,8 +56,9 @@ popdef(`namespace')dnl
 popdef(`macroname')dnl
 popdef(`definition')dnl
 popdef(`namespacemacro')dnl
+')dnl
 restorequote()dnl
-')')
+')
 
 define(`namespacemethod', `changequote`'dnl
 ifelse(eval(`$# == 2'), `1',
@@ -65,8 +66,9 @@ ifelse(eval(`$# == 2'), `1',
 `definemethod(`@namespacemethod_temp', `$3')dnl
 namespacedef(`$1', `$2', defn(`@namespacemethod_temp'))dnl
 undefine(`@namespacemethod_temp')dnl
+')dnl
 restorequote()dnl
-')')
+')
 
 # namespaceimport(<namespace>, <methods...>)
 definemethod(`namespaceimport', `
