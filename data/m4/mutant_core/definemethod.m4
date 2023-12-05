@@ -13,25 +13,32 @@ restorequote
 define(`@macro_output')
 
 define(`@print()', `
+	changequote
 	pushdef(`@temp', defn(`@macro_output'))
 	popdef(`@macro_output')
 	pushdef(`@macro_output', defn(`@temp')`$1')
 	popdef(`@temp')
+	restorequote
 ')
 
 define(`@printf()', `
+	changequote
 	pushdef(`@temp', defn(`@macro_output'))
 	popdef(`@macro_output')
-	pushdef(`@macro_output', defn(`@temp')format(``$1'',shift($@)))
+	pushdef(`@macro_output',
+		defn(`@temp')format(``$1'',restorequote()shift($@),changequote))
 	popdef(`@temp')
+	restorequote
 ')
 
 define(`@printq()', `
+	changequote
 	pushdef(`@temp', defn(`@macro_output'))
 	popdef(`@macro_output')
 	pushdef(`@macro_output',
 		defn(`@temp')$`'1`$1'$`'2)
 	popdef(`@temp')
+	restorequote
 ')
 
 # variables used in @var()
@@ -124,10 +131,10 @@ restorequote()dnl
 
 define(`@method_macros', `dnl
 pushdef(`return', `indir(`@default_start_quote')')dnl
-pushdef(`print',  `changequote`'indir(`@print()',' $`'@`)restorequote()')dnl
-pushdef(`printq', `changequote`'indir(`@printq()','$`'@`)restorequote()')dnl
-pushdef(`printf', `changequote`'indir(`@printf()','$`'@`)restorequote()')dnl
-pushdef(`var',    `changequote`'indir(`@var()','   $`'@`)restorequote()')dnl
+pushdef(`print',  `indir(changequote`@print()'restorequote,'  $`'@`)')dnl
+pushdef(`printq', `indir(changequote`@printq()'restorequote,' $`'@`)')dnl
+pushdef(`printf', `indir(changequote`@printf()'restorequote,' $`'@`)')dnl
+pushdef(`var',    `indir(changequote`@var()'restorequote,'    $`'@`)')dnl
 pushdef(`println', format(``changequote`'print(`$%d
 ')restorequote()'',`1'))dnl
 pushdef(`printqln', format(``changequote`'printq(`$%d

@@ -133,6 +133,34 @@ class TestMutantCoreDefinemethod(MutantCoreTester):
 			..."""
 		assert self.m4_match(input_str, output_str)
 
+	def test_definemethod_print_different_quotes(self):
+		input_str = """
+			definemethod(`different_quotes', `
+				changequote([,])
+				println([``hello world''])
+				println([-------])
+				print([``hello world''])
+				println()
+				println([-------])
+				printq([`hello world'])
+				println()
+				println([-------])
+				printf([``%s %s''], [hello], [world])
+				restorequote
+			')dnl
+			different_quotes
+		"""
+		output_str = """
+			`hello world'
+			-------
+			`hello world'
+			-------
+			`hello world'
+			-------
+			`hello world'
+		"""
+		assert self.m4_match(input_str, output_str)
+
 	def test_definemethod_nested_call(self):
 		input_str = """
 		definemethod(`first', `
