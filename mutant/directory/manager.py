@@ -88,10 +88,15 @@ class MutantDirectory:
 		repo = repos.joinpath(parts[0])
 		resources = repo.joinpath('resources')
 
+		if resources.is_dir():
+			include_dirs=(resources,)
+		else:
+			include_dirs=()
+
 		with open(filepath, 'r') as file:
 			return self.eval_template(
 				file.read(),
-				include_dirs=(resources,),
+				include_dirs=include_dirs,
 				cwd=filepath.parent,
 				options=options,
 			)
