@@ -93,8 +93,12 @@ class MutantDirectory:
 	@staticmethod
 	def __solve_provide_rules(provide_rules, starting_options=tuple()):
 		options = set(starting_options)
-		graph = {}
+		graph = MutantDirectory.__create_condition_to_rule_map(provide_rules, options)
+		return MutantDirectory.__derive_options(options, graph)
 
+	@staticmethod
+	def __create_condition_to_rule_map(provide_rules, options):
+		graph = {}
 		for rule in provide_rules:
 			if len(rule['conditions']) == 0:
 				for option in rule['provides']:
@@ -105,25 +109,23 @@ class MutantDirectory:
 					graph[option].append(rule)
 				else:
 					graph[option] = [rule]
+		return graph
 
-		changed = True
+	@staticmethod
+	def __derive_options(options, graph):
 		fresh_options = list(options)
-		fresh_options_next = []
-		while changed:
-			changed = False
-			for condition in fresh_options:
-				if condition not in graph:
+		while len(fresh_options) > 0:
+			condition = fresh_options.pop(0)
+			if condition not in graph:
+				continue
+			for rule in graph[condition]:
+				rule['conditions'].remove(condition)
+				if len(rule['conditions']) > 0:
 					continue
-				for rule in graph[condition]:
-					rule['conditions'].remove(condition)
-					if len(rule['conditions']) > 0:
-						continue
-					for option in rule['provides']:
-						options.add(option)
-						fresh_options_next.append(option)
-					changed = True
-				del graph[condition]
-			fresh_options, fresh_options_next = fresh_options_next, fresh_options
-			fresh_options_next.clear()
+				for option in rule['provides']:
+					options.add(option)
+					if option in graph and option != condition:
+						fresh_options.append(option)
+			del graph[condition]
 
 		return options

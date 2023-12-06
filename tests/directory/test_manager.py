@@ -53,7 +53,7 @@ class TestMutantDirectory:
 		)
 
 		options = mutant_dir.eval_options()
-		assert options == set((
+		valid_set = set((
 			'option_A',
 			'option_B',
 			'option_C',
@@ -70,6 +70,7 @@ class TestMutantDirectory:
 			'zsh_m4_option_B',
 			'zsh_m4_option_AB',
 		))
+		assert len(options.symmetric_difference(valid_set)) == 0
 
 	def test_eval_template(self, create_testdir):
 		mutant_dir = MutantDirectory(
