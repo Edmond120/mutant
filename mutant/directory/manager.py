@@ -69,6 +69,27 @@ class MutantDirectory:
 		)
 		return m4.pipe(template_string, cwd=cwd)
 
+	def eval_template_file(self, filepath, *, options=None):
+		repos = self.path.joinpath('repos')
+		if not filepath.is_relative_to(repos):
+			raise ValueError(f'{filepath.as_posix()} is not relative to {self.path.as_posix}')
+		if not filepath.is_file():
+			raise ValueError(f'{filepath.as_posix()} does not exist')
+		parts = filepath.relative_to(repos).parts
+		if not ( parts[1] == 'src' and len(parts) >= 3 ):
+			raise ValueError(f'{filepath.as_posix()} is not a valid template path')
+
+		repo = repos.joinpath(parts[0])
+		resources = repo.joinpath('resources')
+
+		with open(filepath, 'r') as file:
+			return self.eval_template(
+				file.read(),
+				include_dirs=(resources,),
+				cwd=filepath.parent,
+				options=options,
+			)
+
 	@staticmethod
 	def __solve_provide_rules(provide_rules, starting_options=tuple()):
 		options = set(starting_options)

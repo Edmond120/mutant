@@ -116,3 +116,50 @@ class TestMutantDirectory:
 				')
 			')option_array_length"""
 		) == str(len(options))
+
+	def test_eval_template_file_errors(self, create_testdir):
+		mutant_dir = MutantDirectory(
+			create_testdir('template')
+			.joinpath('dotfiles')
+		)
+
+		repos_path = mutant_dir.path.joinpath('repos')
+		invalid_paths = [
+			Path('/'), # not in mutant dir
+			mutant_dir.path.joinpath('config'), # not in a repo
+			repos_path.joinpath('non_existant/file'),
+			repos_path.joinpath('burb/provides.m4'), # invalid template path
+		]
+		for path in invalid_paths:
+			try:
+				mutant_dir.eval_template_file(path)
+				assert False
+			except ValueError:
+				pass
+
+
+	def test_eval_template_file(self, create_testdir):
+		mutant_dir = MutantDirectory(
+			create_testdir('template')
+			.joinpath('dotfiles')
+		)
+
+		src_dir = mutant_dir.path.joinpath('repos/burb/src')
+
+		filepath = src_dir.joinpath('simple.m4')
+		output = mutant_dir.eval_template_file(filepath)
+		assert output == "hello world\n"
+
+		filepath = src_dir.joinpath('settings.m4')
+		output = mutant_dir.eval_template_file(filepath)
+		assert output == '{\n\t"myoption": "A",\n\t"experimental_feature": false,\n}\n'
+
+	def test_eval_template_cwd(self, create_testdir):
+		mutant_dir = MutantDirectory(
+			create_testdir('template')
+			.joinpath('dotfiles')
+		)
+
+		filepath = mutant_dir.path.joinpath('repos/burb/src/include.m4')
+		output = mutant_dir.eval_template_file(filepath)
+		assert output == 'from plain.txt\nfrom res.txt\n'
