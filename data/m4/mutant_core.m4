@@ -4,4 +4,5 @@ include(`mutant_core/changequote.m4')dnl
 include(`mutant_core/divert.m4')dnl
 include(`mutant_core/definemethod.m4')dnl
 include(`mutant_core/namespace.m4')dnl
+include(`mutant_core/package.m4')dnl
 ')dnl
