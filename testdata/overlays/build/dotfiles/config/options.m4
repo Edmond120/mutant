@@ -1,1 +1,1 @@
-
+alternatives(ls,eza)

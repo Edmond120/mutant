@@ -172,7 +172,7 @@ class TestMutantDirectory:
 			assert directory.is_dir()
 
 		filepath_content_pairs = (
-			( 'zsh/zshrc.m4', "alias cat=bat\nalias l=lf\n" ),
+			( 'zsh/zshrc.m4', "alias cat=bat\nalias l=lf\nalias ls=eza\n" ),
 			( 'zsh/settings/options', None ),
 			( 'zsh/settings/a/b/c/obscure.txt', "hello world\n" ),
 			( 'zsh/settings/a/b/m4_test.m4', "hello world\n" ),
