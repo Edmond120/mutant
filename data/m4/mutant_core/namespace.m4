@@ -78,6 +78,18 @@ definemethod(`namespaceimport', `
 	ifelse(namespace, `', `return')
 	ifelse(method, `', `return')
 
+	ifelse(method, `*', `
+		ifdef(format(``@namespace[%s]:*'', namespace), `
+			namespaceimport(namespace,
+				enternamespace(namespace)indir(`*')`'leavenamespace)
+			namespaceimport(namespace, shift(shift($@)))
+			return
+		', `
+			namespaceimport(namespace, shift(shift($@)))
+			return
+		')
+	')
+
 	# Check for rename operator ->
 	var(`arrow_regex', `` +-> +'')
 	var(`regex', format(``^\(.*\)%s\(.*\)$'', arrow_regex))

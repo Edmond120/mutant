@@ -444,3 +444,28 @@ class TestMutantCoreNamespace(MutantCoreTester):
 			hello
 		"""
 		assert self.m4_match(input_str, correct_output)
+
+	def test_namespaceimport_asterisk(self):
+		input_str = """
+			enternamespace(`mypackage')dnl
+			namespacedef(`*', ``publicmethod_one',
+				`publicmethod_two',
+			')dnl
+			namespacemethod(`publicmethod_one', `
+				printq(`this is method one')
+			')dnl
+			namespacemethod(`publicmethod_two', `
+				printq(`this is method two')
+			')dnl
+			leavenamespace()dnl
+			namespaceimport(`mypackage', `*')dnl
+			publicmethod_one
+			----
+			publicmethod_two
+		"""
+		correct_output = """
+			this is method one
+			----
+			this is method two
+		"""
+		assert self.m4_match(input_str, correct_output)
