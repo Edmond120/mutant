@@ -1,6 +1,16 @@
+import pytest
 from pathlib import Path
 from mutant.directory import manager
 from mutant.directory.manager import MutantDirectory
+
+@pytest.fixture()
+def create_mutant_dir(create_testdir):
+	def func(overlay):
+		return MutantDirectory(
+			create_testdir(overlay)
+			.joinpath('dotfiles')
+		)
+	return func
 
 class TestMutantDirectory:
 	def test_new(self, tmp_path):
@@ -46,11 +56,8 @@ class TestMutantDirectory:
 		assert repo.joinpath('provides.m4').is_file()
 		assert repo.joinpath('.git').is_dir()
 
-	def test_eval_options(self, create_testdir):
-		mutant_dir = MutantDirectory(
-			create_testdir('options')
-			.joinpath('dotfiles')
-		)
+	def test_eval_options(self, create_mutant_dir):
+		mutant_dir = create_mutant_dir('options')
 
 		options = mutant_dir.eval_options()
 		valid_set = set((
@@ -72,21 +79,15 @@ class TestMutantDirectory:
 		))
 		assert len(options.symmetric_difference(valid_set)) == 0
 
-	def test_eval_template(self, create_testdir):
-		mutant_dir = MutantDirectory(
-			create_testdir('template')
-			.joinpath('dotfiles')
-		)
+	def test_eval_template(self, create_mutant_dir):
+		mutant_dir = create_mutant_dir('template')
 
 		assert mutant_dir.eval_template(
 			"definemethod(`mymacro', `printq(`hello world')')mymacro"
 		) == "hello world"
 
-	def test_eval_template_options(self, create_testdir):
-		mutant_dir = MutantDirectory(
-			create_testdir('template')
-			.joinpath('dotfiles')
-		)
+	def test_eval_template_options(self, create_mutant_dir):
+		mutant_dir = create_mutant_dir('template')
 
 		# options are obtained by mutant_dir.eval_options
 		tests = (
@@ -99,11 +100,9 @@ class TestMutantDirectory:
 		result_str = '\n'.join(map(lambda x: x[1], tests))
 		assert mutant_dir.eval_template(test_str) == result_str
 
-	def test_eval_template_option_array(self, create_testdir):
-		mutant_dir = MutantDirectory(
-			create_testdir('template')
-			.joinpath('dotfiles')
-		)
+	def test_eval_template_option_array(self, create_mutant_dir):
+		mutant_dir = create_mutant_dir('template')
+
 		options = mutant_dir.eval_options()
 		assert mutant_dir.eval_template(
 			"""definemethod(`option_array_length', `
@@ -118,11 +117,8 @@ class TestMutantDirectory:
 			')option_array_length"""
 		) == str(len(options))
 
-	def test_eval_template_file_errors(self, create_testdir):
-		mutant_dir = MutantDirectory(
-			create_testdir('template')
-			.joinpath('dotfiles')
-		)
+	def test_eval_template_file_errors(self, create_mutant_dir):
+		mutant_dir = create_mutant_dir('template')
 
 		repos_path = mutant_dir.path.joinpath('repos')
 		invalid_paths = [
@@ -139,12 +135,8 @@ class TestMutantDirectory:
 				pass
 
 
-	def test_eval_template_file(self, create_testdir):
-		mutant_dir = MutantDirectory(
-			create_testdir('template')
-			.joinpath('dotfiles')
-		)
-
+	def test_eval_template_file(self, create_mutant_dir):
+		mutant_dir = create_mutant_dir('template')
 		src_dir = mutant_dir.path.joinpath('repos/burb/src')
 
 		filepath = src_dir.joinpath('simple.m4')
@@ -155,12 +147,12 @@ class TestMutantDirectory:
 		output = mutant_dir.eval_template_file(filepath)
 		assert output == '{\n\t"myoption": "A",\n\t"experimental_feature": false,\n}\n'
 
-	def test_eval_template_cwd(self, create_testdir):
-		mutant_dir = MutantDirectory(
-			create_testdir('template')
-			.joinpath('dotfiles')
-		)
-
+	def test_eval_template_cwd(self, create_mutant_dir):
+		mutant_dir = create_mutant_dir('template')
 		filepath = mutant_dir.path.joinpath('repos/burb/src/include.m4')
 		output = mutant_dir.eval_template_file(filepath)
 		assert output == 'from plain.txt\nfrom res.txt\n'
+
+	def test_eval_options_alternative_options(self, create_mutant_dir):
+		mutant_dir = create_mutant_dir('options')
+		assert 'unprovided_option' in mutant_dir.eval_options(('unavailable_option',))
