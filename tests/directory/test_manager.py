@@ -156,3 +156,32 @@ class TestMutantDirectory:
 	def test_eval_options_alternative_options(self, create_mutant_dir):
 		mutant_dir = create_mutant_dir('options')
 		assert 'unprovided_option' in mutant_dir.eval_options(('unavailable_option',))
+
+	def test_build_configs(self, create_mutant_dir):
+		mutant_dir = create_mutant_dir('build')
+		build_dir = mutant_dir.path.joinpath('build')
+		mutant_dir.build_configs()
+
+		directories = map(lambda name: build_dir.joinpath(name),
+			(
+				'bat', 'lf',
+				'zsh', 'zsh/settings', 'zsh/settings/a/b/c',
+			)
+		)
+		for directory in directories:
+			assert directory.is_dir()
+
+		filepath_content_pairs = (
+			( 'zsh/zshrc.m4', "alias cat=bat\nalias l=lf\n" ),
+			( 'zsh/settings/options', None ),
+			( 'zsh/settings/a/b/c/obscure.txt', "hello world\n" ),
+			( 'zsh/settings/a/b/m4_test.m4', "hello world\n" ),
+			( 'lf/lfrc.m4', 'map i $bat --paging always "$f"\n'),
+		)
+		for filepath, contents in filepath_content_pairs:
+			file = build_dir.joinpath(filepath)
+			assert file.is_file()
+			if contents is None:
+				continue
+			with file.open() as f:
+				assert f.read() == contents

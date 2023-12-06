@@ -1,3 +1,5 @@
+import shutil
+from pathlib import Path
 from itertools import chain
 from mutant.directory import creator
 from mutant.directory import parser
@@ -100,6 +102,48 @@ class MutantDirectory:
 				cwd=filepath.parent,
 				options=options,
 			)
+
+	def build_configs(self, starting_options=None):
+		options = self.eval_options(starting_options)
+		build_dir = self.path.joinpath('build')
+		repos_dir = self.path.joinpath('repos')
+		for repo in repos_dir.iterdir():
+			build_repo = build_dir.joinpath(repo.name)
+			root = repo.joinpath('src')
+			shutil.copytree(root, build_repo,
+				symlinks=True,
+				ignore=self.__filter_m4_files,
+			)
+			file_filter = lambda f: f.name.endswith('.m4')
+			template_files = self.__depth_first_transversal(root, file_filter)
+			for template_file in template_files:
+				tail = template_file.relative_to(root)
+				dest = build_repo.joinpath(tail)
+				self.__build_m4_file(template_file, dest, options)
+
+	def __build_m4_file(self, filepath, dest, options):
+		data = self.eval_template_file(filepath, options=options)
+		with dest.open('w') as file:
+			shutil.copystat(filepath, dest, follow_symlinks=False)
+			file.write(data)
+
+	@staticmethod
+	def __depth_first_transversal(dir, file_filter):
+		for item in dir.iterdir():
+			if item.is_symlink():
+				continue # pragma: nocover
+			if item.is_dir():
+				yield from MutantDirectory.__depth_first_transversal(item, file_filter)
+				continue
+			if item.is_file() and file_filter(item):
+				yield item
+
+	@staticmethod
+	def __filter_m4_files(directory, names):
+		return filter(lambda name:
+			Path(directory).joinpath(name).is_file() and name.endswith('.m4'),
+			names
+		)
 
 	@staticmethod
 	def __solve_provide_rules(provide_rules, starting_options=tuple()):

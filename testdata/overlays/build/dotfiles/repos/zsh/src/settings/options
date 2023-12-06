@@ -1,0 +1,9 @@
+setopt \
+	no_equals \
+	extended_history \
+	hist_ignore_space \
+	hist_no_store \
+	inc_append_history \
+	noclobber \
+	rm_star_silent \
+	mark_dirs
