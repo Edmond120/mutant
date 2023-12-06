@@ -30,14 +30,20 @@ class MutantDirectory:
 		mutation_dir_path = self.path.joinpath('repos', name)
 		creator.create_mutation_dir(mutation_dir_path, remote=remote)
 
-	def eval_options(self):
-		options_file = self.path.joinpath('config/options.m4')
-		options = set(parser.read_options(options_file))
+	def eval_options(self, alternative_options=None):
+		if alternative_options is None:
+			options_file = self.path.joinpath('config/options.m4')
+			options = set(parser.read_options(options_file))
+		else:
+			options = set(alternative_options)
 
 		repos = self.path.joinpath('repos')
 		provide_rules = []
 		for repo in repos.iterdir():
-			rules = parser.read_provides(repo.joinpath('provides.m4'))
+			provides_file = repo.joinpath('provides.m4')
+			if not provides_file.is_file():
+				continue
+			rules = parser.read_provides(provides_file)
 			provide_rules.extend(rules)
 
 		options.update(
