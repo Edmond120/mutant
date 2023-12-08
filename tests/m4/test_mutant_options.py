@@ -31,12 +31,15 @@ class TestMutantOptions(M4Tester):
 			option([myoption], [`two'])
 			option([myoption], [[two]])
 			option([myotheroption], [`three'])
+			option([invalid], [`wrong_output'],
+			       [myoption], [[two]])
 		"""
 		output_str = """
 			`one'
 			`TWO'
 			two
 			`three'
+			two
 		"""
 		assert self.m4_match(input_str, output_str)
 

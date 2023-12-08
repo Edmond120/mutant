@@ -10,7 +10,7 @@ namespacemethod(`option', `
 	ifelse(eval(`$# >= 4'), 1, `
 		ifdef(format(``option:%s'', `$1'),
 			`print(`$2')',
-			`print(`changequote`'option(shift(shift($@restorequote())))')'
+			`errprint($@)print(`option(shift(shift($@)))')'
 		)
 		return
 	')
