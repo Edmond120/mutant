@@ -2,21 +2,21 @@ ifdef(`@include[mutant_core/changequote.m4]', `', `dnl
 define(`@include[mutant_core/changequote.m4]')dnl
 divert(-1)
 
-# This is a m4 library to use a stack for changing quotes.
-# By using a stack for quotes in your macro definitions,
-# you can change quotes without having to worry about
-# switching back before calling your macros to avoid
-# breaking them.
+dnl # This is a m4 library to use a stack for changing quotes.
+dnl # By using a stack for quotes in your macro definitions,
+dnl # you can change quotes without having to worry about
+dnl # switching back before calling your macros to avoid
+dnl # breaking them.
 
-# stack:
-#   description:
-#     Pushed using "changequote".
-#     Popped using "restorequote".
-#   values:
-#     @quotestack[start]
-#     @quotestack[end]
-#     @quotestack[defaultquote()]
-#     @quotestack[isdefault]
+dnl # stack:
+dnl #   description:
+dnl #     Pushed using "changequote".
+dnl #     Popped using "restorequote".
+dnl #   values:
+dnl #     @quotestack[start]
+dnl #     @quotestack[end]
+dnl #     @quotestack[defaultquote()]
+dnl #     @quotestack[isdefault]
 define(`@init_quotestack', `dnl
 define(`@quotestack[start]')
 define(`@quotestack[end]')
@@ -25,18 +25,18 @@ define(`@quotestack[isdefault]', `true')
 ')
 indir(`@init_quotestack')
 
-# defaultquote:
-#   Sets the quotes back to `' but does not pop the stack.
-#   If you want to switch back to the default quotes, it is
-#   better to just use changequote with no arguments and/or
-#   restorequote.
+dnl # defaultquote:
+dnl #   Sets the quotes back to `' but does not pop the stack.
+dnl #   If you want to switch back to the default quotes, it is
+dnl #   better to just use changequote with no arguments and/or
+dnl #   restorequote.
 define(`defaultquote')
 
-# changequote:
-#   Calls the builtin changequote and pushes to the stack.
-#   Takes the same arguments as the builtin changequote but
-#   only accepts either 0 or 2 non-void arguments.
-#   The ability to disable quoting is not allowed.
+dnl # changequote:
+dnl #   Calls the builtin changequote and pushes to the stack.
+dnl #   Takes the same arguments as the builtin changequote but
+dnl #   only accepts either 0 or 2 non-void arguments.
+dnl #   The ability to disable quoting is not allowed.
 
 define(`changequote', `defaultquote`'dnl
 ifelse(`$#', `0', `indir(`@changequote_0arg')',
@@ -77,9 +77,9 @@ pushdef(`@quotestack[isdefault]', `false')dnl
 builtin(`changequote', `$1', `$2')dnl
 ')
 
-# restorequote:
-#   Pops the stack and changes the quotes to the ones that are
-#   now on the top of the stack.
+dnl # restorequote:
+dnl #   Pops the stack and changes the quotes to the ones that are
+dnl #   now on the top of the stack.
 define(`restorequote', `defaultquote`'dnl
 popdef(`@quotestack[start]')dnl
 popdef(`@quotestack[end]')dnl

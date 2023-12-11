@@ -5,8 +5,8 @@ include(`mutant_core/divert.m4')dnl
 include(`mutant_core/definemethod.m4')dnl
 divert(`-1')
 
-# If @thisnamespace is an empty string then the current namespace is
-# the global namespace. All methods defined here are "public".
+dnl # If @thisnamespace is an empty string then the current namespace is
+dnl # the global namespace. All methods defined here are "public".
 define(`@thisnamespace')
 
 define(`namespacedef', `changequote`'dnl
@@ -70,7 +70,7 @@ undefine(`@namespacemethod_temp')dnl
 restorequote()dnl
 ')
 
-# namespaceimport(<namespace>, <methods...>)
+dnl # namespaceimport(<namespace>, <methods...>)
 definemethod(`namespaceimport', `
 	ifelse(eval(`$# < 2'), 1, `return')
 	var(`namespace', ``$1'')
@@ -90,7 +90,7 @@ definemethod(`namespaceimport', `
 		')
 	')
 
-	# Check for rename operator ->
+	dnl # Check for rename operator ->
 	var(`arrow_regex', `` +-> +'')
 	var(`regex', format(``^\(.*\)%s\(.*\)$'', arrow_regex))
 	ifelse(regexp(method, arrow_regex), `-1', `

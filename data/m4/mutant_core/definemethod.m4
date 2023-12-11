@@ -9,7 +9,7 @@ changequote(`[',`]')
 	define([@default_end_quote], ['])
 restorequote
 
-# Variable to hold the output of a macro
+dnl # Variable to hold the output of a macro
 define(`@macro_output')
 
 define(`@print()', `
@@ -41,14 +41,14 @@ define(`@printq()', `
 	restorequote
 ')
 
-# variables used in @var()
-# -----------------------------
-# arrays are indexed starting at 1
-# @definemethod_layer = recursion depth
-# @definemethod_var[<n>] = var_array length, n specifies array,
-#                        arrays are created up to the recursion depth
-# @definemethod_var[<n>][<m>] = var name, m is index
-# @definemethod_var[<n>]:<name> = macro definition given name
+dnl # variables used in @var()
+dnl # -----------------------------
+dnl # arrays are indexed starting at 1
+dnl # @definemethod_layer = recursion depth
+dnl # @definemethod_var[<n>] = var_array length, n specifies array,
+dnl #                        arrays are created up to the recursion depth
+dnl # @definemethod_var[<n>][<m>] = var name, m is index
+dnl # @definemethod_var[<n>]:<name> = macro definition given name
 
 define(`@definemethod_layer', 0)
 define(`@definemethod_var[0]', 0)
@@ -64,7 +64,7 @@ define(`@var()', `
 			defn(`@definemethod_layer'),
 			`$1'),
 		`
-		# if variable is already defined
+		dnl # if variable is already defined
 		define(
 			format(``@definemethod_var[%d]:%s'',
 				defn(`@definemethod_layer'),
@@ -73,7 +73,7 @@ define(`@var()', `
 		popdef(`$1')
 		pushdef(`$1', `$2')
 		',`
-		# if variable is undefined
+		dnl # if variable is undefined
 		pushdef(`array',
 			format(``@definemethod_var[%s]'',
 				defn(`@definemethod_layer')))
@@ -95,13 +95,13 @@ define(`@var()', `
 	')
 ')
 
-# Method specs
-#   - Output is ignored except for first argument in print()
-#   - Quotes are `'
-#   - No unquoted dangling parentheses (due to implementation)
-#   - Print buffer is a macro and will be called with args 1 & 2
-#     being the start and end quotes of the scope where the method
-#     is called.
+dnl # Method specs
+dnl #   - Output is ignored except for first argument in print()
+dnl #   - Quotes are `'
+dnl #   - No unquoted dangling parentheses (due to implementation)
+dnl #   - Print buffer is a macro and will be called with args 1 & 2
+dnl #     being the start and end quotes of the scope where the method
+dnl #     is called.
 define(`@definemethod_count', `0')
 
 define(`definemethod', `changequote`'dnl
@@ -170,9 +170,9 @@ popdef(defn(`@definemethod_var[$1][$2]'))dnl
 ')dnl
 indir(`@method_vars_loop()', `$1', decr(`$2'), `$3')')')
 
-# Discard arguments and output @macro_output instead
-# Quotes from the outside scope are passed as arguments
-# to the output macro.
+dnl # Discard arguments and output @macro_output instead
+dnl # Quotes from the outside scope are passed as arguments
+dnl # to the output macro.
 define(`@method_return()', `defaultquote`'dnl
 pushdef(`quote_isdefault', defn(`@quotestack[isdefault]'))dnl
 ifelse(defn(`quote_isdefault'), `true', `dnl
