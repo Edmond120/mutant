@@ -4,3 +4,4 @@
 
 [zsh]
 url = repos/zsh_config/
+path = ../target/zsh

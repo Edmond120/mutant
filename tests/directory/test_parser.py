@@ -37,10 +37,12 @@ class TestParser:
 			{
 				'name': 'zsh',
 				'url' : 'git@example.com:zsh_config',
+				'path': '../target/zsh',
 			},
 			{
 				'name': 'bash',
 				'url' : 'git@example.com:bash_config',
+				'path': '../target/bash',
 			},
 		]
 

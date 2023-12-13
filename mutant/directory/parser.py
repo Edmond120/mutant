@@ -90,10 +90,14 @@ def read_repos(path):
 	repos = []
 	for section in config.sections():
 		if 'url' not in config[section]:
-			message = f'Url missing in repo config for: {section}'
+			message = f'url missing in repo config for: {section}'
+			raise ConfigFileError(message)
+		if 'path' not in config[section]:
+			message = f'path missing for repo config for: {section}'
 			raise ConfigFileError(message)
 		repos.append({
 			'name': section,
 			'url' : config[section]['url'],
+			'path': config[section]['path'],
 		})
 	return repos
