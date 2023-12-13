@@ -68,7 +68,7 @@ def _make_config_options(path):
 			#     syscmd(`qlist -I')
 			# I perfer to prefix generated options.
 			# Ex.
-			#     syscmd(`qlist -I | sed "s/^/pack:/"')
+			#     syscmd(`qlist -I | sed "s/^/package:/"')
 		"""
 		data = map(lambda s: s.strip(), data.split('\n'))
 		next(data)
