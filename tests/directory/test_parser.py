@@ -51,5 +51,6 @@ class TestParser:
 		assert repos_file.is_file()
 		try:
 			parser.read_repos(repos_file)
+			assert False
 		except ConfigFileError:
 			pass
