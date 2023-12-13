@@ -1,8 +1,8 @@
 import pytest
 import shutil
 import pathlib
-import subprocess
 import mutant
+from mutant.utils import git
 
 def apply_overlay(overlay, target):
 	if not overlay.exists():
@@ -19,18 +19,9 @@ def apply_overlay(overlay, target):
 			raise IsADirectoryError('target is not a file')
 		shutil.copyfile(overlay, target)
 
-def init_git_repo(path):
-	commands = (
-		('git', 'init'),
-		('git', 'add', '-A'),
-		('git', 'commit', '-m', 'First commit'),
-	)
-	for command in commands:
-		subprocess.run(command, cwd=path)
-
 def setup_repos(repos_path):
 	for repo in repos_path.iterdir():
-		init_git_repo(repo)
+		git.Repo(repo).init()
 
 @pytest.fixture()
 def create_testdir(tmp_path):

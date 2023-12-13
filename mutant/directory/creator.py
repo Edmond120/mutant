@@ -3,6 +3,7 @@ Module for creating a mutant project directory.
 """
 import subprocess
 from mutant.directory import parser
+from mutant.utils import git
 
 def create_mutant_dir(path):
 	"""
@@ -33,19 +34,11 @@ def create_mutant_dir(path):
 		func(path.joinpath(filename))
 
 def _to_repo(repo_path, *, remote=''):
-	create_commands = (
-		( 'git', 'init' ),
-		( 'git', 'add', '-A' ),
-		( 'git', 'commit', '-m', 'First commit' ),
-	)
-	for command in create_commands:
-		subprocess.run(command, cwd=repo_path)
+	repo = git.Repo(repo_path)
+	repo.init()
 
 	if remote:
-		subprocess.run(
-			( 'git', 'remote', 'add', '--', 'origin', remote ),
-			cwd=repo_path,
-		)
+		repo.remote_add('origin', remote)
 
 def _make_config_repos(path):
 	with path.open('x') as file:
@@ -96,8 +89,7 @@ def clone_repos(mutant_dir):
 		dest = repos.joinpath(name)
 		if dest.exists():
 			continue #pragma: nocover
-		command = ('git', 'clone', '--', url, str(dest))
-		subprocess.run(command)
+		git.Repo.clone(url, dest)
 
 def create_mutation_dir(path, *, remote=''):
 	"""
