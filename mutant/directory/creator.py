@@ -16,6 +16,7 @@ def create_mutant_dir(path):
 	"""
 	path.mkdir()
 	mkdir = lambda p: p.mkdir()
+	touch = lambda x: x.open('x').close()
 
 	tasks = (
 		( 'config'           , mkdir                ),
@@ -25,6 +26,7 @@ def create_mutant_dir(path):
 		( 'repos'            , mkdir                ),
 		( 'stow'             , mkdir                ),
 		( 'build'            , mkdir                ),
+		( '.mutant'          , touch                ),
 	)
 
 	for filename, func in tasks:

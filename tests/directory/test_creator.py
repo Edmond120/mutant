@@ -15,6 +15,7 @@ class TestCreator:
 			( 'repos'            , is_directory ),
 			( 'stow'             , is_directory ),
 			( 'build'            , is_directory ),
+			( '.mutant'          , is_file      ),
 		)
 
 		for path, test in files:
