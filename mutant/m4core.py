@@ -2,7 +2,6 @@
 Module for interacting with m4
 """
 
-import subprocess
 import resource
 import shutil
 import mutant.paths
