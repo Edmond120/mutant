@@ -17,3 +17,6 @@ class LPBrokenPipeError(LimitedProcessError, BrokenPipeError):
 class M4Error(Exception):
 	"Exception that is related to m4"
 	pass
+
+class NotASymlinkError(Exception):
+	pass
