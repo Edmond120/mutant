@@ -6,7 +6,6 @@ import configparser
 import re
 import os
 from mutant import m4core
-from mutant.exceptions import ConfigFileError
 
 def _get_valid_lines(data):
 	return filter(
@@ -93,13 +92,6 @@ def read_repos(path):
 
 	repo_configs = []
 	for section in config.sections():
-		if 'url' not in config[section]:
-			message = f'url missing in repo config for: {section}'
-			raise ConfigFileError(message)
-		if 'path' not in config[section]:
-			message = f'path missing for repo config for: {section}'
-			raise ConfigFileError(message)
-
 		url = config[section]['url']
 		path = config[section]['path']
 

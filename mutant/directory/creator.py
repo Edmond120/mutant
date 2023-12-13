@@ -84,6 +84,8 @@ def clone_repos(mutant_dir):
 	repos_config = parser.read_repos(repos_config_file)
 
 	for config in repos_config:
+		if 'url' not in config:
+			continue #pragma: nocover
 		name = config['name']
 		url = config['url']
 		dest = repos.joinpath(name)

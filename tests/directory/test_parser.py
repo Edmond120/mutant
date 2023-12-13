@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 from mutant.directory import parser
-from mutant.exceptions import ConfigFileError
 
 class TestParser:
 	def test_read_options(self):
@@ -47,12 +46,3 @@ class TestParser:
 				'path': '../target/bash',
 			},
 		]
-
-	def test_read_repos_fail(self, create_testdir):
-		repos_file = Path('testdata/files/config_repos_invalid')
-		assert repos_file.is_file()
-		try:
-			parser.read_repos(repos_file)
-			assert False
-		except ConfigFileError:
-			pass

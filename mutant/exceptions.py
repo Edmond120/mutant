@@ -1,7 +1,3 @@
-class ConfigFileError(Exception):
-	"Exception for situations where a configuration file is invalid."
-	pass
-
 class LimitedProcessError(Exception):
 	"Exception that is specific to mutant.utils.process.LimitedProcess"
 	pass
