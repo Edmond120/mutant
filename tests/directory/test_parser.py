@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from mutant.directory import parser
 from mutant.exceptions import ConfigFileError
@@ -31,6 +32,7 @@ class TestParser:
 		]
 
 	def test_read_repos(self):
+		os.environ['BASH_DIR'] = 'bash'
 		repos_file = Path('testdata/files/config_repos')
 		assert repos_file.is_file()
 		assert parser.read_repos(repos_file) == [

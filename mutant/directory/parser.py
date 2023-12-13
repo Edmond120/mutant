@@ -3,6 +3,8 @@ Module for parsing files in a mutant directory.
 """
 
 import configparser
+import re
+import os
 from mutant import m4core
 from mutant.exceptions import ConfigFileError
 
@@ -87,7 +89,9 @@ def read_repos(path):
 	config = configparser.ConfigParser()
 	config.read(path)
 
-	repos = []
+	env_substr_regex = re.compile(r'\$\{([a-zA-Z_]\w*)\}')
+
+	repo_configs = []
 	for section in config.sections():
 		if 'url' not in config[section]:
 			message = f'url missing in repo config for: {section}'
@@ -95,9 +99,19 @@ def read_repos(path):
 		if 'path' not in config[section]:
 			message = f'path missing for repo config for: {section}'
 			raise ConfigFileError(message)
-		repos.append({
-			'name': section,
-			'url' : config[section]['url'],
-			'path': config[section]['path'],
+
+		url = config[section]['url']
+		path = config[section]['path']
+
+		repo_configs.append({
+			'name' : section,
+			'url' : re.sub(env_substr_regex, _env_sub, url),
+			'path' : re.sub(env_substr_regex, _env_sub, path),
 		})
-	return repos
+	return repo_configs
+
+def _env_sub(matchobj):
+	env_name = matchobj.group(1)
+	if env_name in os.environ:
+		return os.environ[env_name]
+	return ''

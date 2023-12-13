@@ -4,4 +4,4 @@ path = ../target/zsh
 
 [bash]
 url = git@example.com:bash_config
-path = ../target/bash
+path = ../target/${BASH_DIR}
