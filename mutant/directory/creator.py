@@ -26,6 +26,7 @@ def create_mutant_dir(path):
 		( 'config'           , _to_repo             ),
 		( 'repos'            , mkdir                ),
 		( 'stow'             , mkdir                ),
+		( 'stow'             , _to_repo             ),
 		( 'build'            , mkdir                ),
 		( '.mutant'          , touch                ),
 	)

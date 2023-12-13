@@ -14,6 +14,7 @@ class TestCreator:
 			( 'config/options.m4', is_file      ),
 			( 'repos'            , is_directory ),
 			( 'stow'             , is_directory ),
+			( 'stow/.git'        , is_directory ),
 			( 'build'            , is_directory ),
 			( '.mutant'          , is_file      ),
 		)
