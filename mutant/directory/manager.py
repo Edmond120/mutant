@@ -19,6 +19,10 @@ class MutantDirectory:
 
 	def __init__(self, path):
 		self.path = path
+		self.config_dir = path.joinpath('config')
+		self.repos_dir = path.joinpath('repos')
+		self.stow_dir = path.joinpath('stow')
+		self.build_dir = path.joinpath('build')
 
 		path_str = path.absolute().as_posix()
 		if not path.exists():
@@ -30,19 +34,18 @@ class MutantDirectory:
 		creator.clone_repos(self.path)
 
 	def create_mutation(self, name, *, remote=''):
-		mutation_dir_path = self.path.joinpath('repos', name)
+		mutation_dir_path = self.repos_dir.joinpath(name)
 		creator.create_mutation_dir(mutation_dir_path, remote=remote)
 
 	def eval_options(self, alternative_options=None):
 		if alternative_options is None:
-			options_file = self.path.joinpath('config/options.m4')
+			options_file = self.config_dir.joinpath('options.m4')
 			options = set(parser.read_options(options_file))
 		else:
 			options = set(alternative_options)
 
-		repos = self.path.joinpath('repos')
 		provide_rules = []
-		for repo in repos.iterdir():
+		for repo in self.repos_dir.iterdir():
 			provides_file = repo.joinpath('provides.m4')
 			if not provides_file.is_file():
 				continue
@@ -79,7 +82,7 @@ class MutantDirectory:
 		return m4.pipe(template_string, cwd=cwd)
 
 	def eval_template_file(self, filepath, *, options=None):
-		repos = self.path.joinpath('repos')
+		repos = self.repos_dir
 		if not filepath.is_relative_to(repos):
 			raise ValueError(f'{filepath.as_posix()} is not relative to {self.path.as_posix}')
 		if not filepath.is_file():
@@ -106,10 +109,8 @@ class MutantDirectory:
 
 	def build_configs(self, starting_options=None):
 		options = self.eval_options(starting_options)
-		build_dir = self.path.joinpath('build')
-		repos_dir = self.path.joinpath('repos')
-		for repo in repos_dir.iterdir():
-			build_repo = build_dir.joinpath(repo.name)
+		for repo in self.repos_dir.iterdir():
+			build_repo = self.build_dir.joinpath(repo.name)
 			root = repo.joinpath('src')
 			shutil.copytree(root, build_repo,
 				symlinks=True,
@@ -123,15 +124,13 @@ class MutantDirectory:
 				self.__build_m4_file(template_file, dest, options)
 
 	def update_stowdir(self):
-		build_dir = self.path.joinpath('build')
-		stow_dir = self.path.joinpath('stow')
-		for dir in stow_dir.iterdir():
+		for dir in self.stow_dir.iterdir():
 			if dir.is_dir() and dir.name == '.git':
 				continue
 			shutil.rmtree(dir)
-		for dir in build_dir.iterdir():
-			shutil.copytree(dir, stow_dir.joinpath(dir.name), symlinks=True )
-		git.Repo(stow_dir) \
+		for dir in self.build_dir.iterdir():
+			shutil.copytree(dir, self.stow_dir.joinpath(dir.name), symlinks=True )
+		git.Repo(self.stow_dir) \
 		.add_all() \
 		.commit()
 
