@@ -90,17 +90,17 @@ def read_repos(path):
 
 	env_substr_regex = re.compile(r'\$\{([a-zA-Z_]\w*)\}')
 
-	repo_configs = []
+	repo_configs = {}
 	for section in config.sections():
-		url = config[section]['url']
-		path = config[section]['path']
-
-		repo_configs.append({
-			'name' : section,
-			'url' : re.sub(env_substr_regex, _env_sub, url),
-			'path' : re.sub(env_substr_regex, _env_sub, path),
-		})
-	return repo_configs
+		conf = { 'name' : section }
+		if 'url' in config[section]:
+			url = config[section]['url']
+			conf['url'] = re.sub(env_substr_regex, _env_sub, url)
+		if 'path' in config[section]:
+			path = config[section]['path']
+			conf['path'] = re.sub(env_substr_regex, _env_sub, path)
+		repo_configs[section] = conf
+	return list(repo_configs.values())
 
 def _env_sub(matchobj):
 	env_name = matchobj.group(1)
