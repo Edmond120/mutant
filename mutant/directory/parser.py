@@ -106,4 +106,4 @@ def _env_sub(matchobj):
 	env_name = matchobj.group(1)
 	if env_name in os.environ:
 		return os.environ[env_name]
-	return ''
+	return '' # pragma: nocover

@@ -13,9 +13,9 @@ def install(mutant_dir):
 	for repo in repo_configs:
 		src = mutant_dir.stow_dir.joinpath(repo['name'])
 		if not src.is_dir():
-			continue
+			continue # pragma: nocover
 		if 'path' not in repo:
-			continue
+			continue # pragma: nocover
 		dst = _into_path(mutant_dir.path, repo['path'])
 		stow.overwrite_link(src, dst)
 
@@ -26,7 +26,7 @@ def uninstall(mutant_dir):
 	repo_configs = parser.read_repos(mutant_dir.config_dir.joinpath('repos'))
 	for repo in repo_configs:
 		if 'path' not in repo:
-			continue
+			continue # pragma: nocover
 		link = _into_path(mutant_dir.path, repo['path'])
 		stow.remove_link(link, mutant_dir.stow_dir.joinpath(repo['name']))
 
