@@ -4,6 +4,7 @@ from itertools import chain
 from mutant.directory import creator
 from mutant.directory import parser
 from mutant.m4core import M4
+from mutant.utils import git
 
 class MutantDirectory:
 	"""
@@ -120,6 +121,19 @@ class MutantDirectory:
 				tail = template_file.relative_to(root)
 				dest = build_repo.joinpath(tail)
 				self.__build_m4_file(template_file, dest, options)
+
+	def update_stowdir(self):
+		build_dir = self.path.joinpath('build')
+		stow_dir = self.path.joinpath('stow')
+		for dir in stow_dir.iterdir():
+			if dir.is_dir() and dir.name == '.git':
+				continue
+			shutil.rmtree(dir)
+		for dir in build_dir.iterdir():
+			shutil.copytree(dir, stow_dir.joinpath(dir.name), symlinks=True )
+		git.Repo(stow_dir) \
+		.add_all() \
+		.commit()
 
 	def __build_m4_file(self, filepath, dest, options):
 		data = self.eval_template_file(filepath, options=options)

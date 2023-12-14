@@ -1,0 +1,8 @@
+[zsh]
+path = ../target/zsh
+
+[bash]
+path = ../target/bash
+
+[fish]
+path = ../target/fish

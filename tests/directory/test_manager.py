@@ -185,3 +185,11 @@ class TestMutantDirectory:
 				continue
 			with file.open() as f:
 				assert f.read() == contents
+
+	def test_update_stowdir(self, create_mutant_dir):
+		mutant_dir = create_mutant_dir('apply_configs')
+		remove_this = mutant_dir.path.joinpath('stow', 'remove')
+		remove_this.mkdir()
+		mutant_dir.update_stowdir()
+		assert not remove_this.exists()
+		assert mutant_dir.path.joinpath('stow', '.git').is_dir()
