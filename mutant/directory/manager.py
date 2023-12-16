@@ -108,7 +108,7 @@ class MutantDirectory:
 			)
 
 	def build_configs(self, starting_options=None):
-		self.__clean_build_dir()
+		self.__clean_dir(self.build_dir, ignore_filter=lambda d: d.name == '.git')
 		options = self.eval_options(starting_options)
 		for repo in self.repos_dir.iterdir():
 			build_repo = self.build_dir.joinpath(repo.name)
@@ -128,26 +128,25 @@ class MutantDirectory:
 			repo.add_all().commit()
 
 	def update_stowdir(self):
-		for dir in self.stow_dir.iterdir():
-			if not dir.is_dir(): continue
-			shutil.rmtree(dir)
+		self.__clean_dir(self.stow_dir)
 		for dir in filter(lambda x: x.is_dir(), self.build_dir.iterdir()):
 			if not dir.is_dir() or dir.name == '.git': continue
 			shutil.copytree(dir, self.stow_dir.joinpath(dir.name), symlinks=True )
-
-	def __clean_build_dir(self):
-		for item in self.build_dir.iterdir():
-			if item.name == '.git': continue
-			if item.is_dir():
-				shutil.rmtree(item)
-			else:
-				item.unlink()
 
 	def __build_m4_file(self, filepath, dest, options):
 		data = self.eval_template_file(filepath, options=options)
 		with dest.open('w') as file:
 			shutil.copystat(filepath, dest, follow_symlinks=False)
 			file.write(data)
+
+	@staticmethod
+	def __clean_dir(dir, ignore_filter=lambda x: False):
+		for item in dir.iterdir():
+			if ignore_filter(item): continue
+			if item.is_dir():
+				shutil.rmtree(item)
+			else:
+				item.unlink()
 
 	@staticmethod
 	def __depth_first_transversal(dir, file_filter):
