@@ -5,9 +5,14 @@ class Repo:
 		self.path = path
 
 	def _run(self, *args, **kwargs):
-		process = subprocess.run(*args, **kwargs, cwd=self.path)
+		process = subprocess.run(*args, **kwargs,
+			cwd=self.path,
+			capture_output=True,
+			text=True,
+		)
 		if process.returncode != 0:
 			raise RuntimeError(f'Command failed: {process}')
+		return process
 
 	def init(self, message="First commit"):
 		self._run(('git', 'init'))
@@ -26,6 +31,10 @@ class Repo:
 	def commit(self, message='Commit'):
 		self._run(( 'git', 'commit', '-a', '-m', message))
 		return self
+
+	def has_changed(self):
+		process = self._run(('git', 'status', '--porcelain'))
+		return len(process.stdout) > 0
 
 	@classmethod
 	def clone(cls, url, dst):

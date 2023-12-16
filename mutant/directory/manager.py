@@ -108,6 +108,7 @@ class MutantDirectory:
 			)
 
 	def build_configs(self, starting_options=None):
+		self.__clean_build_dir()
 		options = self.eval_options(starting_options)
 		for repo in self.repos_dir.iterdir():
 			build_repo = self.build_dir.joinpath(repo.name)
@@ -122,7 +123,9 @@ class MutantDirectory:
 				tail = template_file.relative_to(root)
 				dest = build_repo.joinpath(tail)
 				self.__build_m4_file(template_file, dest, options)
-		git.Repo(self.build_dir).add_all().commit()
+		repo = git.Repo(self.build_dir)
+		if repo.has_changed():
+			repo.add_all().commit()
 
 	def update_stowdir(self):
 		for dir in self.stow_dir.iterdir():
@@ -131,6 +134,14 @@ class MutantDirectory:
 		for dir in filter(lambda x: x.is_dir(), self.build_dir.iterdir()):
 			if not dir.is_dir() or dir.name == '.git': continue
 			shutil.copytree(dir, self.stow_dir.joinpath(dir.name), symlinks=True )
+
+	def __clean_build_dir(self):
+		for item in self.build_dir.iterdir():
+			if item.name == '.git': continue
+			if item.is_dir():
+				shutil.rmtree(item)
+			else:
+				item.unlink()
 
 	def __build_m4_file(self, filepath, dest, options):
 		data = self.eval_template_file(filepath, options=options)

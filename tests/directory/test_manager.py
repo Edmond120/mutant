@@ -1,4 +1,5 @@
 import pytest
+import subprocess
 from pathlib import Path
 from mutant.directory import manager
 from mutant.directory.manager import MutantDirectory
@@ -186,9 +187,26 @@ class TestMutantDirectory:
 			with file.open() as f:
 				assert f.read() == contents
 
+	def test_commit_only_when_changed(self, create_mutant_dir):
+		mutant_dir = create_mutant_dir('build')
+		assert _number_of_commits(mutant_dir.build_dir) == 1
+		mutant_dir.build_configs()
+		assert _number_of_commits(mutant_dir.build_dir) == 2
+		mutant_dir.build_configs()
+		assert _number_of_commits(mutant_dir.build_dir) == 2
+
 	def test_update_stowdir(self, create_mutant_dir):
 		mutant_dir = create_mutant_dir('apply_configs')
 		remove_this = mutant_dir.path.joinpath('stow', 'remove')
 		remove_this.mkdir()
 		mutant_dir.update_stowdir()
 		assert not remove_this.exists()
+
+def _number_of_commits(git_repo_path):
+	process = subprocess.run(
+		('git', 'log', '--oneline'),
+		cwd=git_repo_path,
+		capture_output=True,
+		text=True,
+	)
+	return len(process.stdout.splitlines())
