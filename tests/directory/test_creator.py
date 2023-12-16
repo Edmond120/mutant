@@ -9,13 +9,15 @@ class TestCreator:
 		is_file = lambda x: x.is_file()
 		files = (
 			( 'config'           , is_directory ),
+			( 'config/.gitignore', is_file      ),
 			( 'config/.git'      , is_directory ),
 			( 'config/repos'     , is_file      ),
 			( 'config/options.m4', is_file      ),
 			( 'repos'            , is_directory ),
 			( 'stow'             , is_directory ),
-			( 'stow/.git'        , is_directory ),
 			( 'build'            , is_directory ),
+			( 'build/.gitignore'  , is_file     ),
+			( 'build/.git'        , is_directory),
 			( '.mutant'          , is_file      ),
 		)
 

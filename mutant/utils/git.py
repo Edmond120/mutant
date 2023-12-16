@@ -5,16 +5,14 @@ class Repo:
 		self.path = path
 
 	def _run(self, *args, **kwargs):
-		return subprocess.run(*args, **kwargs, cwd=self.path)
+		process = subprocess.run(*args, **kwargs, cwd=self.path)
+		if process.returncode != 0:
+			raise RuntimeError(f'Command failed: {process}')
 
-	def init(self, commit_message="First commit"):
-		commands = (
-			('git', 'init'),
-			('git', 'add', '-A'),
-			('git', 'commit', '-m', commit_message),
-		)
-		for command in commands:
-			self._run(command)
+	def init(self, message="First commit"):
+		self._run(('git', 'init'))
+		self.add_all()
+		self.commit(message)
 		return self
 
 	def remote_add(self, name, url):
@@ -25,7 +23,7 @@ class Repo:
 		self._run(('git', 'add', '-A'))
 		return self
 
-	def commit(self, message='commit'):
+	def commit(self, message='Commit'):
 		self._run(( 'git', 'commit', '-a', '-m', message))
 		return self
 

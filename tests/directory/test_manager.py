@@ -192,4 +192,3 @@ class TestMutantDirectory:
 		remove_this.mkdir()
 		mutant_dir.update_stowdir()
 		assert not remove_this.exists()
-		assert mutant_dir.path.joinpath('stow', '.git').is_dir()

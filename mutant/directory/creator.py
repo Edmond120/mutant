@@ -21,13 +21,15 @@ def create_mutant_dir(path):
 
 	tasks = (
 		( 'config'           , mkdir                ),
+		( 'config/.gitignore', touch                ),
 		( 'config/repos'     , _make_config_repos   ),
 		( 'config/options.m4', _make_config_options ),
 		( 'config'           , _to_repo             ),
 		( 'repos'            , mkdir                ),
 		( 'stow'             , mkdir                ),
-		( 'stow'             , _to_repo             ),
 		( 'build'            , mkdir                ),
+		( 'build/.gitignore' , touch                ),
+		( 'build'            , _to_repo             ),
 		( '.mutant'          , touch                ),
 	)
 
