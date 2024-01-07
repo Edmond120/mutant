@@ -3,7 +3,6 @@ Contains the paths to related directories that are installed outside of
 the module.
 """
 
-import sys
 import mutant
 from pathlib import Path
 
