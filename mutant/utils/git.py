@@ -11,7 +11,7 @@ class Repo:
 			text=True,
 		)
 		if process.returncode != 0:
-			raise RuntimeError(f'Command failed: {process}')
+			raise RuntimeError(f'Command failed: {process}') # pragma: nocover
 		return process
 
 	def init(self, message="First commit"):
