@@ -1,9 +1,10 @@
 import argparse
 from mutant.cli import commands
+from mutant.cli import arg_types
 
 def run_command(args):
 	parsed_args = main_parser.parse_args(args)
-	return parsed_args.command_func(parsed_args)
+	parsed_args.command_func(parsed_args)
 
 class Command_parser:
 	"""
@@ -43,5 +44,5 @@ subparsers = main_parser.add_subparsers(
 		command_name = 'create',
 		command_func = commands.create,
 	)
-	.add_argument('directory')
+	.add_argument('directory', type=arg_types.non_existent_file)
 )
