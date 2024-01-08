@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 from mutant.cli import commands
 from mutant.cli import arg_types
 
@@ -20,12 +21,27 @@ class Command_parser:
 		parser.set_defaults(
 			command_name = command_name,
 			command_func = command_func,
+			get_mutant_dir = get_mutant_directory,
 		)
 		self.parser = parser
 
 	def add_argument(self, *args, **kwargs):
 		self.parser.add_argument(*args, **kwargs)
 		return self
+
+def get_mutant_directory():
+	match_func = lambda path: path.is_file() and path.name == '.mutant'
+	return _bubble_search(Path.cwd(), match_func)
+
+def _bubble_search(base_path, match_func):
+	return _bubble_search_helper(base_path.absolute(), match_func)
+
+def _bubble_search_helper(base_path, match_func):
+	if base_path == Path('/'):
+		return None # pragma: nocover
+	if any(filter(match_func, base_path.iterdir())):
+		return base_path
+	return _bubble_search_helper(base_path.parent, match_func)
 
 main_parser = argparse.ArgumentParser(
 	prog = 'Mutant',
