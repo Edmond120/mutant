@@ -1,7 +1,6 @@
 import argparse
 from pathlib import Path
 from functools import wraps
-from sys import stderr
 from mutant.cli import commands
 from mutant.cli import arg_types
 from mutant.directory.manager import MutantDirectory
@@ -31,13 +30,10 @@ class Command_parser:
 		if in_mutant_dir:
 			@wraps(command_func)
 			def wrapped_command_func(args):
-				args.mutant_dir = _get_mutant_directory()
+				if not 'mutant_dir' in dir(args):
+					args.mutant_dir = _get_mutant_directory() # pragma: nocover
 				if args.mutant_dir is None:
-					print(
-						'Error: not a mutant directory (or any of the parent directories)',
-						file=stderr,
-					)
-					return
+					raise ValueError('not a mutant directory (or any of the parent directories)') # pragma: nocover
 				command_func(args)
 		else:
 			wrapped_command_func = command_func
@@ -57,7 +53,7 @@ def _get_mutant_directory():
 	match_func = lambda path: path.is_file() and path.name == '.mutant'
 	result = _bubble_search(Path.cwd(), match_func)
 	if result is None:
-		return result
+		return result # pragma: nocover
 	return MutantDirectory(result)
 
 def _bubble_search(base_path, match_func):
@@ -73,6 +69,11 @@ def _bubble_search_helper(base_path, match_func):
 main_parser = argparse.ArgumentParser(
 	prog = 'Mutant',
 	description = 'Generate configuration files with maximal features',
+)
+main_parser.add_argument(
+	'--mutant-dir',
+	dest = 'mutant_dir',
+	type = arg_types.mutant_directory,
 )
 
 subparsers = main_parser.add_subparsers(
