@@ -107,3 +107,9 @@ Command_parser(subparsers,
 	'directory',
 	type = arg_types.non_existent_file,
 )
+
+Command_parser(subparsers,
+	command_name = 'build',
+	command_func = lambda args: args.mutant_dir.build_configs(),
+	in_mutant_dir = True,
+)

@@ -48,6 +48,16 @@ class TestCli:
 		assert my_config.joinpath('src').is_dir()
 		assert my_config.joinpath('resources').is_dir()
 
+	def test_command_build(self, create_testdir, monkeypatch):
+		tmpdir = create_testdir('build')
+		dotfiles = tmpdir.joinpath('dotfiles')
+		monkeypatch.chdir(dotfiles)
+		run_command(['build'])
+		build_dir = dotfiles.joinpath('build')
+		assert build_dir.joinpath('bat').is_dir()
+		assert build_dir.joinpath('lf', 'lfrc.m4').is_file()
+		assert build_dir.joinpath('zsh', 'zshrc.m4').is_file()
+
 class TestCliPrivate:
 	def test_main_parser_command_create(self):
 		args = parser.main_parser.parse_args(['create', 'dotfiles'])
