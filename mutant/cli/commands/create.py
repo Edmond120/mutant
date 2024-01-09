@@ -1,4 +1,0 @@
-from mutant.directory.manager import MutantDirectory
-
-def main(args):
-	MutantDirectory.create(args.directory)

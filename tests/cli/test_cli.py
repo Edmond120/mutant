@@ -1,4 +1,5 @@
 import pytest
+from inspect import isfunction
 from pathlib import Path
 from mutant.cli import run_command
 from mutant.cli import commands
@@ -40,7 +41,7 @@ class TestCliPrivate:
 	def test_main_parser_command_create(self):
 		args = parser.main_parser.parse_args(['create', 'dotfiles'])
 		assert args.command_name == 'create'
-		assert args.command_func == commands.create
+		assert isfunction(args.command_func)
 		assert args.directory == Path('dotfiles')
 
 	def test_get_mutant_directory(self, tmp_path, monkeypatch):

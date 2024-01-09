@@ -86,13 +86,13 @@ subparsers = main_parser.add_subparsers(
 (
 	Command_parser(subparsers,
 		command_name = 'create',
-		command_func = commands.create,
+		command_func = lambda args: MutantDirectory.create(args.directory),
 	)
 	.add_argument('directory', type=arg_types.non_existent_file)
 )
 
 Command_parser(subparsers,
 	command_name = 'clone',
-	command_func = commands.clone,
+	command_func = lambda args: args.mutant_dir.clone_repos(),
 	in_mutant_dir = True,
 )
