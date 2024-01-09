@@ -71,6 +71,17 @@ class TestCli:
 		for repo in repos:
 			assert not target_dir.joinpath(repo).is_symlink()
 
+	def test_command_update(self, create_testdir, monkeypatch):
+		tmpdir = create_testdir('apply_configs')
+		dotfiles = tmpdir.joinpath('dotfiles')
+		stowdir = dotfiles.joinpath('stow')
+		monkeypatch.chdir(dotfiles)
+		repos = ( 'bash', 'fish', 'zsh' )
+		run_command(['update'])
+		for repo in repos:
+			assert stowdir.joinpath(repo).is_dir()
+			assert stowdir.joinpath(repo, repo + 'rc').is_file()
+
 class TestCliPrivate:
 	def test_main_parser_command_create(self):
 		args = parser.main_parser.parse_args(['create', 'dotfiles'])

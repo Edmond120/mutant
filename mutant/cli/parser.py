@@ -126,3 +126,9 @@ Command_parser(subparsers,
 	command_func = lambda args: installer.uninstall(args.mutant_dir),
 	in_mutant_dir = True,
 )
+
+Command_parser(subparsers,
+	command_name = 'update',
+	command_func = lambda args: args.mutant_dir.update_stowdir(),
+	in_mutant_dir = True,
+)
