@@ -6,3 +6,4 @@ namespace object.
 """
 
 from .create import main as create
+from .clone import main as clone

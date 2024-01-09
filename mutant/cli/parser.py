@@ -90,3 +90,9 @@ subparsers = main_parser.add_subparsers(
 	)
 	.add_argument('directory', type=arg_types.non_existent_file)
 )
+
+Command_parser(subparsers,
+	command_name = 'clone',
+	command_func = commands.clone,
+	in_mutant_dir = True,
+)
