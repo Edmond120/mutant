@@ -30,8 +30,10 @@ class Command_parser:
 		if in_mutant_dir:
 			@wraps(command_func)
 			def wrapped_command_func(args):
-				if not 'mutant_dir' in dir(args):
-					args.mutant_dir = _get_mutant_directory() # pragma: nocover
+				if args.mutant_dir is not None:
+					command_func(args)
+					return
+				args.mutant_dir = _get_mutant_directory()
 				if args.mutant_dir is None:
 					raise ValueError('not a mutant directory (or any of the parent directories)') # pragma: nocover
 				command_func(args)
@@ -83,16 +85,25 @@ subparsers = main_parser.add_subparsers(
 
 # Subcommand specifications
 
-(
-	Command_parser(subparsers,
-		command_name = 'create',
-		command_func = lambda args: MutantDirectory.create(args.directory),
-	)
-	.add_argument('directory', type=arg_types.non_existent_file)
-)
+Command_parser(subparsers,
+	command_name = 'create',
+	command_func = lambda args: MutantDirectory.create(args.directory),
+).add_argument('directory', type=arg_types.non_existent_file)
 
 Command_parser(subparsers,
 	command_name = 'clone',
 	command_func = lambda args: args.mutant_dir.clone_repos(),
 	in_mutant_dir = True,
+)
+
+Command_parser(subparsers,
+	command_name = 'mutation',
+	command_func = commands.mutation,
+	in_mutant_dir = True,
+).add_argument(
+	'action',
+	choices = ('create',),
+).add_argument(
+	'directory',
+	type = arg_types.non_existent_file,
 )

@@ -1,6 +1,7 @@
 import pytest
 from inspect import isfunction
 from pathlib import Path
+from mutant.directory.manager import MutantDirectory
 from mutant.cli import run_command
 from mutant.cli import commands
 
@@ -36,6 +37,16 @@ class TestCli:
 			assert False
 		except SystemExit:
 			pass
+
+	def test_command_mutation_create(self, tmp_path, monkeypatch):
+		dotfiles = tmp_path.joinpath('dotfiles')
+		MutantDirectory.create(dotfiles)
+		monkeypatch.chdir(dotfiles)
+		run_command(['mutation', 'create', 'my_config'])
+		my_config = dotfiles.joinpath('repos', 'my_config')
+		assert my_config.joinpath('provides.m4').is_file()
+		assert my_config.joinpath('src').is_dir()
+		assert my_config.joinpath('resources').is_dir()
 
 class TestCliPrivate:
 	def test_main_parser_command_create(self):
