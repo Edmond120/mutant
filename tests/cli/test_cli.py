@@ -58,6 +58,19 @@ class TestCli:
 		assert build_dir.joinpath('lf', 'lfrc.m4').is_file()
 		assert build_dir.joinpath('zsh', 'zshrc.m4').is_file()
 
+	def test_command_install_uninstall(self, create_testdir, monkeypatch):
+		tmpdir = create_testdir('install')
+		dotfiles = tmpdir.joinpath('dotfiles')
+		target_dir = tmpdir.joinpath('target')
+		monkeypatch.chdir(dotfiles)
+		repos = ( 'zsh', 'bash', 'fish' )
+		run_command(['install'])
+		for repo in repos:
+			assert target_dir.joinpath(repo).is_symlink()
+		run_command(['uninstall'])
+		for repo in repos:
+			assert not target_dir.joinpath(repo).is_symlink()
+
 class TestCliPrivate:
 	def test_main_parser_command_create(self):
 		args = parser.main_parser.parse_args(['create', 'dotfiles'])

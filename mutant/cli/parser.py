@@ -3,6 +3,7 @@ from pathlib import Path
 from functools import wraps
 from mutant.cli import commands
 from mutant.cli import arg_types
+from mutant.directory import installer
 from mutant.directory.manager import MutantDirectory
 
 def run_command(args):
@@ -111,5 +112,17 @@ Command_parser(subparsers,
 Command_parser(subparsers,
 	command_name = 'build',
 	command_func = lambda args: args.mutant_dir.build_configs(),
+	in_mutant_dir = True,
+)
+
+Command_parser(subparsers,
+	command_name = 'install',
+	command_func = lambda args: installer.install(args.mutant_dir),
+	in_mutant_dir = True,
+)
+
+Command_parser(subparsers,
+	command_name = 'uninstall',
+	command_func = lambda args: installer.uninstall(args.mutant_dir),
 	in_mutant_dir = True,
 )
