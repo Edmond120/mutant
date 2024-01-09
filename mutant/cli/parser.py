@@ -1,7 +1,10 @@
 import argparse
 from pathlib import Path
+from functools import wraps
+from sys import stderr
 from mutant.cli import commands
 from mutant.cli import arg_types
+from mutant.directory.manager import MutantDirectory
 
 def run_command(args):
 	parsed_args = main_parser.parse_args(args)
@@ -14,14 +17,35 @@ class Command_parser:
 
 	Class functions are mostly just wrappers to argparse that allow
 	for chaining.
+
+	Default args:
+		args.command_name,
+		args.command_func,
+		args.mutant_dir if in_mutant_dir == True
 	"""
 
-	def __init__(self, subparser_group, *, command_name, command_func):
+	def __init__(self, subparser_group, *,
+			command_name, command_func,
+			in_mutant_dir=False,
+		):
+		if in_mutant_dir:
+			@wraps(command_func)
+			def wrapped_command_func(args):
+				args.mutant_dir = _get_mutant_directory()
+				if args.mutant_dir is None:
+					print(
+						'Error: not a mutant directory (or any of the parent directories)',
+						file=stderr,
+					)
+					return
+				command_func(args)
+		else:
+			wrapped_command_func = command_func
+
 		parser = subparser_group.add_parser(command_name)
 		parser.set_defaults(
 			command_name = command_name,
-			command_func = command_func,
-			get_mutant_dir = get_mutant_directory,
+			command_func = wrapped_command_func,
 		)
 		self.parser = parser
 
@@ -29,9 +53,12 @@ class Command_parser:
 		self.parser.add_argument(*args, **kwargs)
 		return self
 
-def get_mutant_directory():
+def _get_mutant_directory():
 	match_func = lambda path: path.is_file() and path.name == '.mutant'
-	return _bubble_search(Path.cwd(), match_func)
+	result = _bubble_search(Path.cwd(), match_func)
+	if result is None:
+		return result
+	return MutantDirectory(result)
 
 def _bubble_search(base_path, match_func):
 	return _bubble_search_helper(base_path.absolute(), match_func)
