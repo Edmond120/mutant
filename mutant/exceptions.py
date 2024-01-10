@@ -16,3 +16,6 @@ class M4Error(Exception):
 
 class NotASymlinkError(Exception):
 	pass
+
+class InvalidMutantDirectoryError(Exception):
+	pass

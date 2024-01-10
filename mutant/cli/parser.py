@@ -5,6 +5,7 @@ from mutant.cli import commands
 from mutant.cli import arg_types
 from mutant.directory import installer
 from mutant.directory.manager import MutantDirectory
+from mutant.exceptions import InvalidMutantDirectoryError
 
 def run_command(args):
 	parsed_args = main_parser.parse_args(args)
@@ -36,7 +37,7 @@ class Command_parser:
 					return
 				args.mutant_dir = _get_mutant_directory()
 				if args.mutant_dir is None:
-					raise ValueError('not a mutant directory (or any of the parent directories)') # pragma: nocover
+					raise InvalidMutantDirectoryError('not a mutant directory (or any of the parent directories)') # pragma: nocover
 				command_func(args)
 		else:
 			wrapped_command_func = command_func
@@ -77,6 +78,10 @@ main_parser.add_argument(
 	'--mutant-dir',
 	dest = 'mutant_dir',
 	type = arg_types.mutant_directory,
+)
+main_parser.set_defaults(
+	command_name = 'help',
+	command_func = lambda _: main_parser.print_help(),
 )
 
 subparsers = main_parser.add_subparsers(
