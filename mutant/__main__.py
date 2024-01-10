@@ -1,5 +1,4 @@
 import sys
-import argparse
 import mutant
 from mutant.exceptions import InvalidMutantDirectoryError
 
