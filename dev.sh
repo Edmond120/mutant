@@ -19,9 +19,13 @@ die() {
 clean() {
 	[ -f .coverage ] && { echo 'Removing: ./.coverage'; rm .coverage; }
 	[ -d .pytest_temp ] && { echo 'Removing: ./.pytest_temp'; rm -rf .pytest_temp; }
-	find . -path ./virtualenv -prune \
-		-o -type d -name __pycache__ -print \
-		-o -type d -name .pytest_cache -print \
+	{
+		find . -path ./virtualenv -prune \
+			-o -type d -name __pycache__ -print \
+			-o -type d -name .pytest_cache -print;
+		[ -d dist ] && echo dist;
+		[ -d mutant.egg-info ] && echo mutant.egg-info;
+	} \
 	| while read line; do
 		echo "Removing: $line"
 		rm -r -- "$line"
@@ -46,6 +50,8 @@ case "$subcommand" in
 		. virtualenv/bin/activate
 		pip install pytest
 		pip install coverage
+		pip install build
+		pip install setuptools
 		;;
 	purge )
 		clean
@@ -65,5 +71,13 @@ case "$subcommand" in
 	coverage )
 		[ -d virtualenv ] || die 'no virtualenv'
 		coverage report
+		;;
+	package )
+		[ -d virtualenv ] || die 'no virtualenv'
+		python -m build
+		;;
+	* )
+		echo 'Invalid Command'
+		echo 'Commands: virtualenv, purge, clean, test, coverage, package'
 		;;
 esac

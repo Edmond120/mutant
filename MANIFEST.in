@@ -1,0 +1,2 @@
+recursive-include mutant/m4 *.m4
+prune tests
