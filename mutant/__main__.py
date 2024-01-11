@@ -1,8 +1,3 @@
-import sys
-import mutant
-from mutant.exceptions import InvalidMutantDirectoryError
+from .main import main
 
-try:
-	mutant.cli.run_command(sys.argv[1:])
-except InvalidMutantDirectoryError as e:
-	print(e)
+main()
