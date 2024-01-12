@@ -55,8 +55,8 @@ class TestCli:
 		run_command(['build'])
 		build_dir = dotfiles.joinpath('build')
 		assert build_dir.joinpath('bat').is_dir()
-		assert build_dir.joinpath('lf', 'lfrc.m4').is_file()
-		assert build_dir.joinpath('zsh', 'zshrc.m4').is_file()
+		assert build_dir.joinpath('lf', 'lfrc').is_file()
+		assert build_dir.joinpath('zsh', 'zshrc').is_file()
 
 	def test_command_install_uninstall(self, create_testdir, monkeypatch):
 		tmpdir = create_testdir('install')

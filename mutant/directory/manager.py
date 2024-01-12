@@ -121,7 +121,7 @@ class MutantDirectory:
 			template_files = self.__depth_first_transversal(root, file_filter)
 			for template_file in template_files:
 				tail = template_file.relative_to(root)
-				dest = build_repo.joinpath(tail)
+				dest = build_repo.joinpath(tail).with_name(tail.name.removesuffix('.m4'))
 				self.__build_m4_file(template_file, dest, options)
 		repo = git.Repo(self.build_dir)
 		if repo.has_changed():
