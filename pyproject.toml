@@ -17,8 +17,12 @@ mutant = "mutant:main"
 
 [tool.setuptools]
 include-package-data = true
-
-[tool.setuptools.packages.find]
-where = ["."]
-exclude = ["tests", "testlib"]
-namespaces = false
+packages = [
+	"mutant",
+	"mutant.cli",
+	"mutant.cli.commands",
+	"mutant.directory",
+	"mutant.m4",
+	"mutant.m4.mutant_core",
+	"mutant.utils",
+]
