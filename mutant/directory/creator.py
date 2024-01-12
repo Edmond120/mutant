@@ -49,6 +49,7 @@ def _make_config_repos(path):
 			# example
 			# [my_git_repo]
 			# url = git@mygitserver.com/my_git_repo
+			# path = ${HOME}/.config/my_config_dir
 		"""
 		data = map(lambda s: s.strip(), data.split('\n'))
 		next(data)
