@@ -10,6 +10,19 @@ dependencies.
 Mutant will then do dependency resolution to try to enable as much
 features as it can.
 
+# Usage
+Read "bugs" section before proceeding.
+
+```sh
+python -m mutant
+```
+
+Create package
+```sh
+./dev.sh virtualenv
+./dev.sh package
+```
+
 # Dependencies
 
 - Python3.11
