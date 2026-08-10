@@ -46,7 +46,7 @@ subcommand=$1
 
 case "$subcommand" in
 	virtualenv )
-		virtualenv virtualenv
+		[ -d virtualenv ] || virtualenv virtualenv
 		. virtualenv/bin/activate
 		pip install pytest
 		pip install coverage

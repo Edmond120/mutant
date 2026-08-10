@@ -28,6 +28,7 @@ class Command_parser:
 	def __init__(self, subparser_group, *,
 			command_name, command_func,
 			in_mutant_dir=False,
+			**argument_parser_kwargs,
 		):
 		if in_mutant_dir:
 			@wraps(command_func)
@@ -42,7 +43,7 @@ class Command_parser:
 		else:
 			wrapped_command_func = command_func
 
-		parser = subparser_group.add_parser(command_name)
+		parser = subparser_group.add_parser(command_name, **argument_parser_kwargs)
 		parser.set_defaults(
 			command_name = command_name,
 			command_func = wrapped_command_func,
@@ -78,6 +79,7 @@ main_parser.add_argument(
 	'--mutant-dir',
 	dest = 'mutant_dir',
 	type = arg_types.mutant_directory,
+	help = 'Path to a Mutant directory, default is current directory. Not all commands use this.',
 )
 main_parser.set_defaults(
 	command_name = 'help',
@@ -94,18 +96,21 @@ subparsers = main_parser.add_subparsers(
 Command_parser(subparsers,
 	command_name = 'create',
 	command_func = lambda args: MutantDirectory.create(args.directory),
+	description = 'Creates a mutant directory',
 ).add_argument('directory', type=arg_types.non_existent_file)
 
 Command_parser(subparsers,
 	command_name = 'clone',
 	command_func = lambda args: args.mutant_dir.clone_repos(),
 	in_mutant_dir = True,
+	description = 'Clones all git repos specified in MUTANT_DIR/config/repos',
 )
 
 Command_parser(subparsers,
 	command_name = 'mutation',
 	command_func = commands.mutation,
 	in_mutant_dir = True,
+	description = 'Creates a Mutation directory in MUTANT_DIR/repos/',
 ).add_argument(
 	'action',
 	choices = ('create',),
@@ -118,22 +123,26 @@ Command_parser(subparsers,
 	command_name = 'build',
 	command_func = lambda args: args.mutant_dir.build_configs(),
 	in_mutant_dir = True,
+	description = 'Builds your configuration files in MUTANT_DIR/repos/, output is in MUTANT_DIR/build/',
 )
 
 Command_parser(subparsers,
 	command_name = 'install',
 	command_func = lambda args: installer.install(args.mutant_dir),
 	in_mutant_dir = True,
+	description = 'Setups symlinks based on the "path" attributes in MUTANT_DIR/config/repos',
 )
 
 Command_parser(subparsers,
 	command_name = 'uninstall',
 	command_func = lambda args: installer.uninstall(args.mutant_dir),
 	in_mutant_dir = True,
+	description = 'Removes symlinks based on the "path" attributes in MUTANT_DIR/config/repos',
 )
 
 Command_parser(subparsers,
 	command_name = 'update',
 	command_func = lambda args: args.mutant_dir.update_stowdir(),
 	in_mutant_dir = True,
+	description = 'Syncs the files in MUTANT_DIR/build/ into MUTANT_DIR/stow/',
 )
